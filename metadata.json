@@ -1,0 +1,10 @@
+{
+  "name": "Maison Atlis",
+  "description": "Haute Couture du Sport — L'excellence et le prestige inspirés par l'héritage de l'Olympe et des Jeux de 1924.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
