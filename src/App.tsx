@@ -183,6 +183,16 @@ export default function App() {
     return [...filteredProducts].sort((a, b) => {
       if (sortBy === "price-asc") return a.price - b.price;
       if (sortBy === "price-desc") return b.price - a.price;
+      if (sortBy === "reviews-desc") {
+        const ratingA = a.reviews?.notation ?? 0;
+        const ratingB = b.reviews?.notation ?? 0;
+        if (ratingB !== ratingA) {
+          return ratingB - ratingA;
+        }
+        const countA = a.reviews?.count ?? 0;
+        const countB = b.reviews?.count ?? 0;
+        return countB - countA;
+      }
       return 0; // default order
     });
   }, [filteredProducts, sortBy]);
@@ -473,7 +483,7 @@ export default function App() {
                     
                     <div className="bg-white border border-neutral-200/60 rounded-md p-4 space-y-3 shadow-inner">
                       {comparedProducts.length === 0 ? (
-                        <p className="text-[11px] text-neutral-500 font-light leading-relaxed">
+                        <p className="text-[11.5px] text-neutral-700 font-medium leading-relaxed">
                           {currentLang === "FR" 
                             ? "Aucun produit sélectionné. Cliquez sur l'icône de balance ⚖️ sur les produits pour comparer."
                             : "No products selected. Click the scale icon ⚖️ on products to compare them."}
@@ -573,6 +583,7 @@ export default function App() {
                         <option value="default">{currentLang === "FR" ? "Ordre par défaut" : "Default order"}</option>
                         <option value="price-asc">{currentLang === "FR" ? "Prix : Ordre croissant" : "Price: Low to High"}</option>
                         <option value="price-desc">{currentLang === "FR" ? "Prix : Ordre décroissant" : "Price: High to Low"}</option>
+                        <option value="reviews-desc">{currentLang === "FR" ? "Avis : Les mieux notés" : "Reviews: Highest Rated"}</option>
                       </select>
                     </div>
                   </div>
@@ -662,7 +673,7 @@ export default function App() {
                       <p className="text-xs font-bold text-[#A37E2C] uppercase tracking-wider">
                         {currentLang === "FR" ? "ASSISTANT VIRTUEL" : "VIRTUAL ASSISTANT"}
                       </p>
-                      <p className="text-xs text-neutral-400 leading-normal font-sans font-light mt-1.5 px-2">
+                      <p className="text-xs text-neutral-750 font-medium leading-normal font-sans mt-1.5 px-2">
                         {currentLang === "FR" 
                           ? "Besoin d'aide pour trouver un produit ? Posez vos questions à notre assistant." 
                           : "Need help finding a product? Ask our assistant."}
@@ -835,7 +846,7 @@ export default function App() {
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             
             <div className="space-y-6">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#A37E2C] font-semibold block">
+              <span className="text-sm sm:text-base uppercase tracking-[0.3em] text-[#A37E2C] font-bold block">
                 {currentLang === "FR" ? "NOTRE HISTOIRE DEPUIS 1924" : "OUR HISTORY SINCE 1924"}
               </span>
               
@@ -845,7 +856,7 @@ export default function App() {
                   : "Creators of high-performance sportswear and equipment in Chamonix"}
               </h2>
 
-              <p className="text-xs text-neutral-300 leading-relaxed font-sans font-light">
+              <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-sans font-light">
                 {currentLang === "FR"
                   ? "Née à Chamonix lors des mémorables Jeux Olympiques d'hiver de 1924, la Maison Atlis incarne l'alliance parfaite entre hautes performances sportives et finitions soignées. Tous nos vélos et vêtements techniques sont fabriqués pour vous garantir un confort thermique optimal et une liberté de mouvement maximale."
                   : "Founded in Chamonix during the historic 1924 Winter Olympics, Maison Atlis represents the perfect association of high performance and elegant tailoring. Our custom cycling frames and technical garments are carefully made to ensure optimal temperature control and complete freedom of motion."}
@@ -853,16 +864,16 @@ export default function App() {
 
               <div className="grid grid-cols-3 gap-6 pt-4 border-t border-white/10 text-center">
                 <div className="space-y-1">
-                  <p className="text-xl font-serif text-[#A37E2C] font-bold">1924</p>
-                  <p className="text-[9px] uppercase tracking-wider text-zinc-400">Fondation</p>
+                  <p className="text-2xl font-serif text-[#A37E2C] font-black">1924</p>
+                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">Fondation</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xl font-serif text-[#A37E2C] font-bold">100%</p>
-                  <p className="text-[9px] uppercase tracking-wider text-zinc-400">Main d'œuvre</p>
+                  <p className="text-2xl font-serif text-[#A37E2C] font-black">100%</p>
+                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">Main d'œuvre</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xl font-serif text-[#A37E2C] font-bold">UTC+1</p>
-                  <p className="text-[9px] uppercase tracking-wider text-zinc-400">Origine Alpes</p>
+                  <p className="text-2xl font-serif text-[#A37E2C] font-black">UTC+1</p>
+                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">Origine Alpes</p>
                 </div>
               </div>
             </div>
@@ -877,8 +888,8 @@ export default function App() {
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-80" />
               <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/5 backdrop-blur-md border border-white/10 space-y-2 text-center rounded">
                 <Award className="w-5 h-5 text-[#A37E2C] mx-auto" />
-                <p className="text-[9px] uppercase tracking-[0.2em] font-bold text-[#A37E2C]">La Chaux-de-Fonds & Chamonix</p>
-                <p className="text-xs text-zinc-200">
+                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] font-bold text-[#A37E2C]">La Chaux-de-Fonds & Chamonix</p>
+                <p className="text-sm sm:text-base text-zinc-200">
                   {currentLang === "FR" ? "Ateliers de couture et d'unification mécanique" : "Textile tailoring & mechanical alignment workshops"}
                 </p>
               </div>
@@ -895,7 +906,7 @@ export default function App() {
           className="max-w-7xl mx-auto px-4 md:px-12 py-20 w-full text-center space-y-10"
         >
           <div className="space-y-3">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#A37E2C] font-bold">
+            <span className="text-xs sm:text-sm uppercase tracking-[0.3em] text-[#A37E2C] font-black">
               {currentLang === "FR" ? "VOTRE MATÉRIEL PERSONNALISÉ" : "YOUR CUSTOM GEAR"}
             </span>
             <h2 className="text-3xl font-serif font-bold text-[#131211]">
@@ -915,14 +926,14 @@ export default function App() {
               </div>
               <h3 className="text-base font-serif font-bold text-[#131211] group-hover:text-[#A37E2C] transition-colors flex items-center justify-between">
                 <span>{currentLang === "FR" ? "Garantie et Service Client" : "Customer Support & Warranty"}</span>
-                <span className="text-[10px] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
+                <span className="text-xs text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
               </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+              <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-sans">
                 {currentLang === "FR"
                   ? "Tous nos équipements sont garantis de par leur excellence. Cliquez pour ouvrir notre assistance de proximité et vérifier de vos contrats."
                   : "All of our products are fully warrantied and benefit from local customer assistance for absolute satisfaction. Click to inspect your contract."}
               </p>
-              <div className="pt-2 flex items-center gap-1 text-[10px] text-[#A37E2C] font-mono tracking-widest font-black uppercase">
+              <div className="pt-2 flex items-center gap-1 text-xs sm:text-sm text-[#A37E2C] font-mono tracking-widest font-black uppercase">
                 <span>{currentLang === "FR" ? "Voir la Garantie" : "Inspect Warranty"}</span>
                 <span>→</span>
               </div>
@@ -938,14 +949,14 @@ export default function App() {
               </div>
               <h3 className="text-base font-serif font-bold text-[#131211] group-hover:text-[#A37E2C] transition-colors flex items-center justify-between">
                 <span>{currentLang === "FR" ? "Personnalisation Unique" : "Customization"}</span>
-                <span className="text-[10px] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
+                <span className="text-xs text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
               </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+              <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-sans">
                 {currentLang === "FR"
                   ? "Ajoutez vos initiales ou logos personnalisés sur vos cadres de vélos, sacs et vêtements. Cliquez pour essayer notre outil de gravure."
                   : "Add your initials or custom logos to your cycling frames, bags, or apparel. Click to open our live embroidery and engraving workshop."}
               </p>
-              <div className="pt-2 flex items-center gap-1 text-[10px] text-[#A37E2C] font-mono tracking-widest font-black uppercase">
+              <div className="pt-2 flex items-center gap-1 text-xs sm:text-sm text-[#A37E2C] font-mono tracking-widest font-black uppercase">
                 <span>{currentLang === "FR" ? "Lancer l'Atelier" : "Open Workshop"}</span>
                 <span>→</span>
               </div>
@@ -961,14 +972,14 @@ export default function App() {
               </div>
               <h3 className="text-base font-serif font-bold text-[#131211] group-hover:text-[#A37E2C] transition-colors flex items-center justify-between">
                 <span>{currentLang === "FR" ? "Conseils pour les Tailles" : "Size Advisors"}</span>
-                <span className="text-[10px] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
+                <span className="text-xs text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
               </h3>
-              <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+              <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-sans">
                 {currentLang === "FR"
                   ? "Choisissez la taille idéale à l'aide de notre conseiller biomec interactif en adaptant les côtes géométriques à vos mesures corporelles."
                   : "Choose the perfect size for your bike frame, clothing, or footwear. Click to open our instant physiological scale calculator."}
               </p>
-              <div className="pt-2 flex items-center gap-1 text-[10px] text-[#A37E2C] font-mono tracking-widest font-black uppercase">
+              <div className="pt-2 flex items-center gap-1 text-xs sm:text-sm text-[#A37E2C] font-mono tracking-widest font-black uppercase">
                 <span>{currentLang === "FR" ? "Calculer ma Taille" : "Calculate My Size"}</span>
                 <span>→</span>
               </div>
@@ -985,10 +996,10 @@ export default function App() {
           
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <AltisLogo className="w-5 h-5 text-[#A37E2C]" />
-              <span className="text-base font-serif font-bold text-white tracking-[0.2em] uppercase">ATLIS S.C.</span>
+              <AltisLogo className="w-6 h-6 text-[#A37E2C]" />
+              <span className="text-lg font-serif font-bold text-white tracking-[0.2em] uppercase">ATLIS S.C.</span>
             </div>
-            <p className="text-[10px] leading-relaxed text-zinc-400">
+            <p className="text-xs sm:text-sm leading-relaxed text-zinc-300">
               {currentLang === "FR"
                 ? "L'excellence athlétique, l'art plastique de Chamonix — Inspiré par l'Olympe depuis 1924."
                 : "Athletic excellence, plastic art form of Chamonix — Inspired by Olympus since index 1924."}
@@ -996,17 +1007,17 @@ export default function App() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-[9px] uppercase tracking-[0.25em] text-[#A37E2C] font-bold">Ateliers & Salons</p>
-            <ul className="space-y-2 text-[10px] text-zinc-400">
-              <li className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-[#A37E2C]" /> Chamonix-Mont-Blanc</li>
-              <li className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-[#A37E2C]" /> Place Vendôme, Paris</li>
-              <li className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-[#A37E2C]" /> Bahnhofstrasse, Zürich</li>
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">Ateliers & Salons</p>
+            <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
+              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#A37E2C]" /> Chamonix-Mont-Blanc</li>
+              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#A37E2C]" /> Place Vendôme, Paris</li>
+              <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#A37E2C]" /> Bahnhofstrasse, Zürich</li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <p className="text-[9px] uppercase tracking-[0.25em] text-[#A37E2C] font-bold">Assistance</p>
-            <ul className="space-y-2 text-[10px] text-zinc-400">
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">Assistance</p>
+            <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
               <li><button onClick={() => setChatbotOpenTrigger(true)} className="hover:text-white transition-colors cursor-pointer text-left">Contacter un conseiller d'Olympe</button></li>
               <li>{currentLang === "FR" ? "Politique de confidentialité" : "Privacy Policies"}</li>
               <li>{currentLang === "FR" ? "Conditions d'Acquisition" : "Acquisition Agreements"}</li>
@@ -1014,25 +1025,28 @@ export default function App() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-[9px] uppercase tracking-[0.25em] text-[#A37E2C] font-bold">Notre Gazette</p>
-            <p className="text-[10px] text-zinc-400 leading-relaxed">
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">Notre Gazette</p>
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
               {currentLang === "FR" ? "Recevez confidentiellement les récits de nos expéditions." : "Receive confidential records of our seasonal wild routes."}
             </p>
             <div className="flex border border-white/10 overflow-hidden focus-within:border-[#A37E2C] transition-colors rounded">
               <input 
                 type="email" 
                 placeholder="courriel@domaine.com" 
-                className="bg-transparent text-white px-3 py-1.5 text-[10px] focus:outline-none w-full"
+                className="bg-transparent text-white px-3.5 py-2 text-xs sm:text-sm focus:outline-none w-full"
               />
-              <button className="bg-[#A37E2C] hover:bg-[#BC9C52] text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider cursor-pointer">OK</button>
+              <button className="bg-[#A37E2C] hover:bg-[#BC9C52] text-white px-4 py-1.5 text-xs font-bold uppercase tracking-wider cursor-pointer">OK</button>
             </div>
           </div>
 
         </div>
 
-        <div className="border-t border-white/5 pt-6 text-center text-[9px] tracking-widest text-[#FAF9F4]/40 flex flex-col sm:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
-          <span>© {new Date().getFullYear()} MAISON ATLIS SPORT COUTURE. TOUS DROITS RÉSERVÉS.</span>
-          <span className="font-serif italic text-zinc-500">« Plus vite, plus haut, plus fort — ensemble »</span>
+        <div className="border-t border-white/5 pt-6 text-xs tracking-widest text-[#FAF9F4]/50 flex flex-col md:flex-row md:justify-between items-center gap-4 max-w-7xl mx-auto md:pr-28">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-center md:text-left">
+            <span>© {new Date().getFullYear()} MAISON ATLIS SPORT COUTURE. TOUS DROITS RÉSERVÉS.</span>
+            <span className="hidden md:inline text-zinc-600 font-serif">|</span>
+            <span className="font-serif italic text-zinc-400 text-sm sm:text-base md:text-lg">« Plus vite, plus haut, plus fort — ensemble »</span>
+          </div>
         </div>
       </footer>
 

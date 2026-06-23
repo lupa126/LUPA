@@ -18,8 +18,8 @@ export default {
         }
       },
       fontFamily: {
-        serif: ["Playfair Display", "Didot", "Georgia", "serif"],
-        sans: ["Cormorant Garamond", "Inter", "system-ui", "sans-serif"],
+        serif: ["Dongle", "Playfair Display", "Didot", "Georgia", "serif"],
+        sans: ["Dongle", "Cormorant Garamond", "Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "Courier New", "monospace"],
       },
       scale: {

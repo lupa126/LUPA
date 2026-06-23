@@ -48,30 +48,50 @@ const ProductCard = memo(function ProductCard({
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {product.isNew && (
-            <span className="text-[8px] tracking-[0.2em] font-bold uppercase bg-[#1C2F22] text-[#FAF9F4] px-2.5 py-1 rounded-sm shadow-sm">
+            <span className="text-[11px] sm:text-xs tracking-[0.2em] font-bold uppercase bg-[#1C2F22] text-[#FAF9F4] px-3.5 py-1.5 rounded-sm shadow-md">
               {t.newBadge}
             </span>
           )}
         </div>
 
-        {/* Compare Button */}
-        {onToggleCompare && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleCompare(product, e);
-            }}
-            className={`absolute top-3 right-3 z-20 p-2 rounded-full border transition-all duration-300 shadow-md flex items-center justify-center min-w-[36px] min-h-[36px] cursor-pointer hover:scale-110 active:scale-95 ${
-              isComparing 
-                ? "bg-[#A37E2C] text-[#FAF9F4] border-[#A37E2C]" 
-                : "bg-[#FAF9F4]/90 text-[#131211] border-neutral-300 hover:border-[#A37E2C] hover:bg-[#FAF9F4]"
-            }`}
-            title={currentLang === "FR" ? `Comparer ${product.name}` : `Compare ${product.name}`}
-            aria-label={currentLang === "FR" ? `Comparer ${product.name}` : `Compare ${product.name}`}
-          >
-            <Scale className={`w-4 h-4 transition-transform duration-300 ${isComparing ? "scale-110 rotate-12" : ""}`} />
-          </button>
-        )}
+        {/* Compare & Favorite Buttons (Top-Right Action Stack) */}
+        <div className="absolute top-3 right-3 flex flex-col gap-2 z-20">
+          {onToggleCompare && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleCompare(product, e);
+              }}
+              className={`p-2 rounded-full border transition-all duration-300 shadow-md flex items-center justify-center min-w-[36px] min-h-[36px] cursor-pointer hover:scale-110 active:scale-95 ${
+                isComparing 
+                  ? "bg-[#A37E2C] text-[#FAF9F4] border-[#A37E2C]" 
+                  : "bg-[#FAF9F4]/90 text-[#131211] border-neutral-300 hover:border-[#A37E2C] hover:bg-[#FAF9F4]"
+              }`}
+              title={currentLang === "FR" ? `Comparer ${product.name}` : `Compare ${product.name}`}
+              aria-label={currentLang === "FR" ? `Comparer ${product.name}` : `Compare ${product.name}`}
+            >
+              <Scale className={`w-4 h-4 transition-transform duration-300 ${isComparing ? "scale-110 rotate-12" : ""}`} />
+            </button>
+          )}
+
+          {onToggleFavorite && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite(product, e);
+              }}
+              className={`p-2 rounded-full border transition-all duration-300 flex items-center justify-center min-w-[36px] min-h-[36px] cursor-pointer hover:scale-110 active:scale-95 shadow-md ${
+                isFavorite 
+                  ? "bg-[#D9383A] text-white border-[#D9383A]" 
+                  : "bg-[#FAF9F4]/90 text-[#D9383A] border-neutral-300 hover:bg-[#D9383A] hover:text-[#FAF9F4]"
+              }`}
+              title={currentLang === "FR" ? "Ajouter aux favoris" : "Add to favorites"}
+              aria-label={currentLang === "FR" ? "Ajouter aux favoris" : "Add to favorites"}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Card Body */}
@@ -79,7 +99,7 @@ const ProductCard = memo(function ProductCard({
         <div className="space-y-2.5">
           {/* Category */}
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A37E2C]">
+            <span className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#A37E2C]">
               {product.category === "aerodynamisme" 
                 ? (currentLang === "FR" ? "VÉLO / CYCLISME" : "BIKE / CYCLING") 
                 : product.category === "exploration-sauvage" 
@@ -89,23 +109,23 @@ const ProductCard = memo(function ProductCard({
             
             {/* Reviews */}
             <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 fill-[#A37E2C] text-[#A37E2C]" />
-              <span className="text-[9px] font-bold font-mono text-[#131211]">
+              <Star className="w-3.5 h-3.5 fill-[#A37E2C] text-[#A37E2C]" />
+              <span className="text-xs sm:text-sm font-bold font-mono text-[#131211]">
                 {rating.toFixed(1)}
               </span>
-              <span className="text-[9px] text-neutral-500 font-sans">
+              <span className="text-xs sm:text-sm text-neutral-500 font-sans">
                 ({reviewsCount})
               </span>
             </div>
           </div>
 
           {/* Title */}
-          <h3 className="text-base font-serif font-semibold text-[#131211] group-hover:text-[#A37E2C] transition-colors">
+          <h3 className="text-lg sm:text-xl font-serif font-semibold text-[#131211] group-hover:text-[#A37E2C] transition-colors leading-tight">
             {product.name}
           </h3>
 
           {/* Short Description */}
-          <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+          <p className="text-sm sm:text-base text-neutral-600 line-clamp-2 leading-relaxed">
             {product.description}
           </p>
         </div>
@@ -113,34 +133,16 @@ const ProductCard = memo(function ProductCard({
         {/* Price Only */}
         <div className="pt-3 border-t border-neutral-300/20 flex items-center justify-between">
           <div>
-            <p className="text-[9px] uppercase tracking-widest text-neutral-500 font-semibold">
+            <p className="text-[11px] sm:text-xs uppercase tracking-widest text-[#A37E2C] font-semibold">
               {currentLang === "FR" ? "Prix" : "Price"}
             </p>
-            <p className="text-base font-serif font-semibold text-[#2E2218] tracking-tight whitespace-nowrap">
+            <p className="text-lg sm:text-xl font-serif font-black text-[#2E2218] tracking-tight whitespace-nowrap">
               {product.price.toLocaleString()} €
             </p>
           </div>
           
           <div className="flex items-center gap-2">
-            {onToggleFavorite && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite(product, e);
-                }}
-                className={`p-1.5 rounded-full border transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 z-20 ${
-                  isFavorite 
-                    ? "bg-[#D9383A] text-white border-[#D9383A]" 
-                    : "bg-[#FAF9F4]/90 text-[#A37E2C] border-neutral-300 hover:text-[#D9383A] hover:border-[#D9383A]"
-                }`}
-                title={currentLang === "FR" ? "Ajouter aux favoris" : "Add to favorites"}
-                aria-label={currentLang === "FR" ? "Ajouter aux favoris" : "Add to favorites"}
-              >
-                <Heart className={`w-3 h-3 ${isFavorite ? "fill-current" : ""}`} />
-              </button>
-            )}
-            
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.15em] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               {currentLang === "FR" ? "Découvrir →" : "Discover →"}
             </span>
           </div>

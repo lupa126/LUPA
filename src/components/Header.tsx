@@ -57,6 +57,38 @@ export default function Header({
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showSportsMenu, setShowSportsMenu] = useState(false);
   const [showFavoritesMenu, setShowFavoritesMenu] = useState(false);
+  const isPLPActive = !!searchQuery?.trim() || selectedSport !== null;
+  const [showHeader, setShowHeader] = useState(true);
+  const [isFixed, setIsFixed] = useState(false);
+
+  // Scroll detection: Sticky & Visible on scroll up ONLY on listing page, otherwise static at original position
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY <= 140) {
+        setShowHeader(true);
+        setIsFixed(false);
+      } else {
+        if (isPLPActive) {
+          if (currentY < lastY) {
+            setShowHeader(true);
+            setIsFixed(true);
+          } else {
+            setShowHeader(false);
+            setIsFixed(true);
+          }
+        } else {
+          setShowHeader(false);
+          setIsFixed(false);
+        }
+      }
+      lastY = currentY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isPLPActive]);
   
   const searchRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
@@ -150,7 +182,15 @@ export default function Header({
         />
       )}
 
-      <header className="sticky top-0 z-50 w-full bg-[#2E2218] text-[#FAF9F4] border-b border-white/10 shadow-lg px-4 md:px-12 py-3 transition-all duration-300">
+      <header className={`z-50 w-full bg-[#2E2218] text-[#FAF9F4] border-b border-white/10 shadow-lg px-4 md:px-12 py-3 transition-transform duration-300 ease-out ${
+        isPLPActive && isFixed
+          ? "fixed top-0 left-0 right-0" 
+          : "relative"
+      } ${
+        isPLPActive && isFixed && !showHeader
+          ? "-translate-y-full opacity-0 pointer-events-none"
+          : "translate-y-0 opacity-100"
+      }`}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
           
           {/* Left Block: Logo ATLIS with custom SVG hand-crafted design */}

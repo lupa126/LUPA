@@ -152,7 +152,7 @@ const mappedDecathlon: Product[] = (decathlonProducts as any[])
       description: generateDescription(p.title, category),
       details: [
         `Gamme : Équipements d'Olympe — Catégorie ${categoryLabel}`,
-        `Mesures d'ajustement : Profil athlétique avancé`,
+        `Leçons de la Montagne : Matériaux de prestige éprouvés`,
         `Évaluation globale : ★ ${p.reviews?.notation || "4.7"}/5 (${p.reviews?.count || "48"} retours certifiés)`,
         `Tailles disponibles : ${p.sizes ? p.sizes.join(", ") : "Premium Standard"}`
       ],

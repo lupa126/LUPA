@@ -367,7 +367,7 @@ export function ProductComparisonModal({
 
                 {!isProductsSectionCollapsed && (
                   <div className="mt-4 pt-4 border-t border-neutral-100 overflow-x-auto pb-2 scrollbar-thin animate-fade-in font-sans">
-                    <div className="min-w-0 grid [--first-col-width:120px] xs:[--first-col-width:130px] sm:[--first-col-width:140px] md:[--first-col-width:165px] [--col-min-width:180px] xs:[--col-min-width:195px] sm:[--col-min-width:210px] md:[--col-min-width:230px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
+                    <div className="min-w-0 grid [--first-col-width:75px] xs:[--first-col-width:92px] sm:[--first-col-width:125px] md:[--first-col-width:165px] [--col-min-width:98px] xs:[--col-min-width:128px] sm:[--col-min-width:170px] md:[--col-min-width:230px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
                       
                       {/* Outer column indicator */}
                       <div className="flex flex-col justify-end pb-4 pr-1 sm:pr-4 border-r border-neutral-100">
@@ -389,15 +389,15 @@ export function ProductComparisonModal({
                             
                             {/* VS Bubble placed on left of column for subsequent products */}
                             {prevProduct && (
-                              <div className="absolute top-[35%] -left-2.5 sm:-left-4 z-10 w-4 h-4 sm:w-8 sm:h-8 rounded-full bg-[#2E2218] text-white border border-[#FAF9F4] text-[7px] sm:text-[10px] font-mono font-black flex items-center justify-center shadow-md">
+                              <div className="absolute top-[35%] -left-2 sm:-left-4 z-10 w-3.5 h-3.5 sm:w-8 sm:h-8 rounded-full bg-[#2E2218] text-white border border-[#FAF9F4] text-[6px] sm:text-[10px] font-mono font-black flex items-center justify-center shadow-md">
                                 VS
                               </div>
                             )}
 
                             {/* Top Points Bubble (Score Circle like Image 1) */}
                             <div className="flex items-center gap-1 sm:gap-3 mb-2 sm:mb-4">
-                              <div className="relative w-6 h-6 sm:w-11 sm:h-11 md:w-14 md:h-14 rounded-full bg-neutral-100 flex items-center justify-center p-0.5 sm:p-1 border border-neutral-300 shadow-xs">
-                                <span className="text-[9px] sm:text-xs md:text-sm font-black font-mono text-[#131211] leading-none block">
+                              <div className="relative w-5 h-5 sm:w-11 sm:h-11 md:w-14 md:h-14 rounded-full bg-neutral-100 flex items-center justify-center p-0.5 sm:p-1 border border-neutral-300 shadow-xs">
+                                <span className="text-[8px] sm:text-xs md:text-sm font-black font-mono text-[#131211] leading-none block">
                                   {stats.score}
                                 </span>
                               </div>
@@ -410,11 +410,11 @@ export function ProductComparisonModal({
                             </div>
 
                             {/* Product Image Stage (Significantly increased on mobile as requested) */}
-                            <div className="relative w-32 h-32 xs:w-36 xs:h-36 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-white border border-neutral-300 p-2 sm:p-4 rounded-xl flex items-center justify-center mb-2.5 group shadow-md animate-fade-in">
+                            <div className="relative w-[85px] h-[85px] xs:w-28 xs:h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-white border border-neutral-300 p-1.5 sm:p-4 rounded-xl flex items-center justify-center mb-2.5 group shadow-md animate-fade-in">
                               {/* Close/Remove button like original and photo 1 */}
                               <button
                                 onClick={() => onRemove(p)}
-                                className="absolute top-1 right-1 sm:top-2 sm:right-2 p-1 bg-white/90 hover:bg-red-500 hover:text-white rounded-full text-neutral-400 border border-neutral-200 shadow-sm z-10 transition-all cursor-pointer"
+                                className="absolute top-1 right-1 sm:top-2 sm:right-2 p-0.5 sm:p-1 bg-white/90 hover:bg-red-500 hover:text-white rounded-full text-neutral-400 border border-neutral-200 shadow-sm z-10 transition-all cursor-pointer"
                                 title={currentLang === "FR" ? "Retirer" : "Remove"}
                               >
                                 <X className="w-2.5 sm:w-3.5 h-2.5 sm:h-3.5" />
@@ -428,24 +428,24 @@ export function ProductComparisonModal({
                               
                               {/* COMPARISON WINNER BADGE overlay like Image 1 */}
                               {isWinner && (
-                                <div className="absolute -bottom-1.5 bg-gradient-to-r from-red-500 to-orange-500 text-white font-mono font-black text-[7px] sm:text-[9.5px] uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-md border border-white">
+                                <div className="absolute -bottom-1.5 bg-gradient-to-r from-red-500 to-orange-500 text-white font-mono font-black text-[6px] sm:text-[9.5px] uppercase tracking-widest px-1.5 py-0.5 rounded-full shadow-md border border-white">
                                   WIN🏆
                                 </div>
                               )}
                             </div>
 
                             {/* Product Title text size auto-scales as requested */}
-                            <h4 className="text-[10px] xs:text-xs sm:text-sm md:text-base font-black text-[#131211] font-serif hover:text-[#A37E2C] transition-colors line-clamp-2 max-w-[110px] xs:max-w-[130px] sm:max-w-[160px] md:max-w-[210px] h-6 sm:h-10 md:h-12 leading-tight mb-1.5 uppercase tracking-wide">
+                            <h4 className="text-[8px] xs:text-[10px] sm:text-sm md:text-base font-black text-[#131211] font-serif hover:text-[#A37E2C] transition-colors line-clamp-2 max-w-[85px] xs:max-w-[110px] sm:max-w-[160px] md:max-w-[210px] h-5 sm:h-10 md:h-12 leading-tight mb-1 uppercase tracking-wide">
                               {p.name}
                             </h4>
 
                             {/* Custom Price Capsule like Image 1 (Significantly increased size on mobile) */}
-                            <div className="mt-1 w-full max-w-[110px] xs:max-w-[130px] sm:max-w-[150px] md:max-w-[190px]">
-                              <div className="bg-neutral-100 border border-neutral-300 hover:border-[#A37E2C] px-2 xs:px-3 sm:px-4 py-1 sm:py-1.5 rounded-full flex items-center justify-between transition-all shadow-sm">
-                                <span className="font-serif font-black text-xs xs:text-sm sm:text-base md:text-lg text-[#2E2218]">
+                            <div className="mt-1 w-full max-w-[85px] xs:max-w-[110px] sm:max-w-[150px] md:max-w-[190px]">
+                              <div className="bg-neutral-100 border border-neutral-300 hover:border-[#A37E2C] px-1 py-0.5 xs:px-2.5 xs:py-1 sm:px-4 sm:py-1.5 rounded-full flex items-center justify-between transition-all shadow-sm">
+                                <span className="font-serif font-black text-[9.5px] xs:text-xs sm:text-base md:text-lg text-[#2E2218] whitespace-nowrap">
                                   {p.price.toLocaleString()} €
                                 </span>
-                                <span className="text-[6px] sm:text-[8.5px] uppercase tracking-wider text-[#A37E2C] font-mono font-black hidden xs:inline ml-1">
+                                <span className="text-[6px] sm:text-[8.5px] uppercase tracking-wider text-[#A37E2C] font-mono font-black hidden md:inline ml-1">
                                   Atlis
                                 </span>
                               </div>
@@ -673,7 +673,7 @@ export function ProductComparisonModal({
 
                 {!isSpecTableCollapsed && (
                   <div className="mt-4 pt-4 border-t border-neutral-100 overflow-x-auto pb-2 scrollbar-thin animate-fade-in font-sans">
-                    <div className="min-w-0 grid [--first-col-width:120px] xs:[--first-col-width:130px] sm:[--first-col-width:140px] md:[--first-col-width:165px] [--col-min-width:180px] xs:[--col-min-width:195px] sm:[--col-min-width:210px] md:[--col-min-width:230px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
+                    <div className="min-w-0 grid [--first-col-width:75px] xs:[--first-col-width:92px] sm:[--first-col-width:125px] md:[--first-col-width:165px] [--col-min-width:98px] xs:[--col-min-width:128px] sm:[--col-min-width:170px] md:[--col-min-width:230px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
                     
                     {/* Atout Clé Row */}
                     <button
@@ -829,7 +829,7 @@ export function ProductComparisonModal({
                 </div>
                 
                 <div className="overflow-x-auto pb-2 scrollbar-thin font-sans">
-                  <div className="min-w-0 grid [--first-col-width:120px] xs:[--first-col-width:130px] sm:[--first-col-width:140px] md:[--first-col-width:165px] [--col-min-width:180px] xs:[--col-min-width:195px] sm:[--col-min-width:210px] md:[--col-min-width:230px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
+                  <div className="min-w-0 grid [--first-col-width:75px] xs:[--first-col-width:92px] sm:[--first-col-width:125px] md:[--first-col-width:165px] [--col-min-width:98px] xs:[--col-min-width:128px] sm:[--col-min-width:170px] md:[--col-min-width:230px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
                     
                     <div className="p-1.5 sm:p-4 font-black text-[9px] sm:text-xs text-[#2E2218] uppercase tracking-wider flex items-center">
                       {currentLang === "FR" ? "OPTIONS" : "OPTIONS"}
