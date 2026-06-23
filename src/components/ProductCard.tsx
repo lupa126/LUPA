@@ -46,9 +46,9 @@ const ProductCard = memo(function ProductCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
           {product.isNew && (
-            <span className="text-[11px] sm:text-xs tracking-[0.2em] font-bold uppercase bg-[#1C2F22] text-[#FAF9F4] px-3.5 py-1.5 rounded-sm shadow-md">
+            <span className="text-[9px] sm:text-[10px] tracking-wider font-extrabold uppercase bg-[#1C2F22]/90 text-white px-2 py-0.5 rounded shadow-sm border border-white/10 select-none">
               {t.newBadge}
             </span>
           )}
@@ -120,14 +120,9 @@ const ProductCard = memo(function ProductCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-lg sm:text-xl font-serif font-semibold text-[#131211] group-hover:text-[#A37E2C] transition-colors leading-tight">
+          <h3 className="text-xl sm:text-[22px] font-serif font-semibold text-[#131211] group-hover:text-[#A37E2C] transition-colors leading-tight">
             {product.name}
           </h3>
-
-          {/* Short Description */}
-          <p className="text-sm sm:text-base text-neutral-600 line-clamp-2 leading-relaxed">
-            {product.description}
-          </p>
         </div>
 
         {/* Price Only */}

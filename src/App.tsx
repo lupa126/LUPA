@@ -481,9 +481,9 @@ export default function App() {
                       )}
                     </div>
                     
-                    <div className="bg-white border border-neutral-200/60 rounded-md p-4 space-y-3 shadow-inner">
+                    <div className="bg-white border-2 border-[#A37E2C]/20 rounded-md p-5 space-y-4 shadow-sm">
                       {comparedProducts.length === 0 ? (
-                        <p className="text-[11.5px] text-neutral-700 font-medium leading-relaxed">
+                        <p className="text-sm xs:text-base text-neutral-800 font-bold leading-relaxed">
                           {currentLang === "FR" 
                             ? "Aucun produit sélectionné. Cliquez sur l'icône de balance ⚖️ sur les produits pour comparer."
                             : "No products selected. Click the scale icon ⚖️ on products to compare them."}
@@ -492,23 +492,23 @@ export default function App() {
                         <>
                           <div className="flex flex-wrap gap-2">
                             {comparedProducts.map((p) => (
-                              <div key={p.id} className="relative group w-10 h-10 border border-neutral-300 rounded p-0.5 bg-neutral-50 shrink-0">
+                              <div key={p.id} className="relative group w-12 h-12 border border-neutral-300 rounded p-1 bg-neutral-50 shrink-0">
                                 <img src={p.image} alt={p.name} className="w-full h-full object-contain" />
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleToggleCompare(p);
                                   }}
-                                  className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 shadow-sm cursor-pointer"
+                                  className="absolute -top-1.5 -right-1.5 bg-red-55 hover:bg-red-650 text-white rounded-full p-1 shadow-sm cursor-pointer"
                                   title={currentLang === "FR" ? "Retirer" : "Remove"}
                                 >
-                                  <X className="w-2 h-2" />
+                                  <X className="w-2.5 h-2.5" />
                                 </button>
                               </div>
                             ))}
                           </div>
-                          <p className="text-[10px] text-neutral-500 font-mono">
-                            {comparedProducts.length} / {typeof window !== "undefined" && window.innerWidth < 768 ? 2 : 4} {currentLang === "FR" ? "création(s) sélectionnée(s)" : "creation(s) selected"}
+                          <p className="text-xs sm:text-sm text-neutral-700 font-sans font-bold">
+                            {comparedProducts.length} / {typeof window !== "undefined" && window.innerWidth < 768 ? 2 : 4} {currentLang === "FR" ? "produit(s) sélectionné(s)" : "product(s) selected"}
                           </p>
                         </>
                       )}
@@ -516,13 +516,13 @@ export default function App() {
                       <button
                         onClick={() => setIsCompareModalOpen(true)}
                         disabled={comparedProducts.length < 2}
-                        className={`w-full py-2.5 text-xs font-serif font-black uppercase tracking-widest transition-all rounded shadow-sm cursor-pointer flex items-center justify-center gap-2 ${
+                        className={`w-full py-3.5 text-sm sm:text-base font-sans font-black uppercase tracking-wider transition-all rounded shadow-md cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] ${
                           comparedProducts.length >= 2
                             ? "bg-[#A37E2C] hover:bg-[#8c6b24] text-white"
-                            : "bg-neutral-100 text-neutral-450 border border-neutral-200 cursor-not-allowed"
+                            : "bg-neutral-100 text-neutral-400 border border-neutral-200 cursor-not-allowed"
                         }`}
                       >
-                        <Scale className="w-3.5 h-3.5" />
+                        <Scale className="w-4.5 h-4.5" />
                         {currentLang === "FR" ? `Comparer maintenant` : `Compare Now`}
                       </button>
                     </div>

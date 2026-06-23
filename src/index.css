@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-size: 150%; /* Uniformly scales up rem-based classes to compensate for Dongle's natural tiny rendering */
+    font-size: 104%; /* Slightly enhanced base size for superb legibility and accessibility without being massive */
   }
   html, body {
     overflow-x: clip;
@@ -15,8 +15,8 @@
   body {
     background-color: #FAF9F4;
     color: #131211;
-    font-family: "Dongle", "Cormorant Garamond", "Inter", sans-serif;
-    line-height: 1.1; /* Compensate for Dongle's high ascenders/descenders */
+    font-family: "Inter", "Cormorant Garamond", sans-serif;
+    line-height: 1.5; /* Proper structural height for readable text blocks */
   }
 }
 

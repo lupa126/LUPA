@@ -690,7 +690,7 @@ export default function Chatbot({
                   }`}
                 >
                   <div
-                    className={`max-w-[90%] md:max-w-[75%] p-4 md:p-5 leading-relaxed text-xs sm:text-sm font-semibold rounded-2xl ${
+                    className={`max-w-[90%] md:max-w-[75%] p-4 md:p-5 leading-relaxed text-sm sm:text-base font-semibold rounded-2xl ${
                       msg.sender === "user"
                         ? "bg-[#2E2218] text-white rounded-tr-none shadow-md border border-[#A37E2C]/20"
                         : "bg-white border border-neutral-300/40 text-[#131211] rounded-tl-none shadow-sm"
@@ -698,7 +698,7 @@ export default function Chatbot({
                   >
                     <p>{msg.text}</p>
                   </div>
-                  <span className="text-[8.5px] text-zinc-500 font-mono mt-1.5 px-2">
+                  <span className="text-[10px] sm:text-xs text-zinc-500 font-mono mt-1.5 px-2">
                     {msg.sender === "user" ? "✓ Choix sélectionné" : "Artisan Atlis"} — {msg.timestamp}
                   </span>
                 </div>
@@ -747,7 +747,6 @@ export default function Chatbot({
                         <button
                           onClick={() => {
                             if (onSelectProduct) onSelectProduct(prod);
-                            setIsOpen(false); // Close full screen on show details
                           }}
                           className="w-full sm:w-auto bg-[#2E2218] hover:bg-[#A37E2C] text-white text-[10px] px-4 py-2.5 uppercase tracking-wider font-mono font-black transition-all rounded-lg flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-sm hover:scale-[1.02]"
                         >
@@ -807,10 +806,10 @@ export default function Chatbot({
                                 ? "Superbe choix d'aérodynamisme. Maison Atlis propose des vélos en carbone de pointe et des textiles aérodynamiques fins. Choisissez votre sous-catégorie :"
                                 : "Magnificent aerodynamic choice. Maison Atlis crafts elite carbon bikes and thermo-regulating textiles. Select your desired subcategory:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] hover:bg-neutral-50/50 text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl shadow-sm hover:scale-[1.01] cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🚴 Vélo & Aérodynamisme" : "🚴 Cycling & Aerodynamics"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
                         
@@ -823,10 +822,10 @@ export default function Chatbot({
                                 ? "L'appel de l'altitude. Maison Atlis fabrique des chaussures de marche d'exception en cuir italien et des sacs et accessoires de montage haut de gamme. Choisissez votre besoin :"
                                 : "The call of extreme heights. Maison Atlis assembles bespoke Tuscan leather boots and high-durability expedition backpacks. Select your specialty:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] hover:bg-neutral-50/50 text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl shadow-sm hover:scale-[1.01] cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "⛰️ Randonnée & Exploration Sauvage" : "⛰️ Hiking & Wild Exploration"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
 
@@ -839,10 +838,10 @@ export default function Chatbot({
                                 ? "Façonner votre temple personnel d'exercice. Nous forgeons des rameurs et tapis en bois noble et des haltères haut de gamme. Choisissez votre pièce :"
                                 : "Refining your personal training sanctuary. We manufacture luxury water rowers, smart trainers, and heavy steel accessories. Select your piece:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] hover:bg-neutral-50/50 text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl shadow-sm hover:scale-[1.01] cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🏃 Cardio & Équipements d'Intérieur" : "🏃 Cardio & Indoor Fitness"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
                       </>
@@ -860,10 +859,10 @@ export default function Chatbot({
                                 ? "Un rêve technique de cyclisme. Nos ingénieurs assemblent des gravels d'exception et des vélos à assistance électrique haut de gamme. Précisez votre type :"
                                 : "An ultimate mechanical cycling dream. Our engineers construct grand gravel frames and active electrical assistants. Refine your frame type:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] hover:shadow-xs text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🚲 Vélos de Prestige (Carbone / Élec)" : "🚲 Elite Carbon & Electrics"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
 
@@ -876,10 +875,10 @@ export default function Chatbot({
                                 ? "Le confort aérodynamique par excellence. Nous concevons des vestes de carrosserie et des casques de soufflerie profilés. Choisissez l'équipement souhaité :"
                                 : "Aerodynamic comfort tailored for high wind resistance. We engineer windbreaker silhouettes and wind-tunnel helmets. Choose your wear:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] hover:shadow-xs text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "👕 Textiles & Protections" : "👕 Apparel & Protection"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
                       </>
@@ -896,9 +895,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici le modèle de route aérodynamique ultime configuré pour les chronos." : "Search complete! Here is the ultimate lightweight aerodynamic frame configured for speed:",
                               "velo-road"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-4 h-4 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Vitesse & Route Pure (Véloce)" : "High Speed Road (Veloce SL)"}</span>
                           </button>
                         )}
@@ -911,9 +910,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici notre célèbre création de Gravel pour les aventures sable et terre." : "Search complete! We selected our iconic luxury Gravel for off-road wanderings:",
                               "velo-gravel"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-4 h-4 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Gravel & Multi-usage (GRVL AF)" : "Gravel Off-road (GRVL AF)"}</span>
                           </button>
                         )}
@@ -926,9 +925,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Notre recommandation se porte sur le tout chemin électrique connecté." : "Search complete! Our ultimate recommendation goes to the connected electric e-explorer.",
                               "velo-elec"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-4 h-4 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Assistance Électrique (E-EXPL)" : "Electric Assist (E-EXPL)"}</span>
                           </button>
                         )}
@@ -946,9 +945,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici le gilet coupe-vent hermétique d'Atlis." : "Search complete! This is our top wind-resistant thermal vest.",
                               "velo-jacket"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Veste & Gilet Thermique" : "Thermal Gilet windbreaker"}</span>
                           </button>
                         )}
@@ -961,9 +960,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici le casque aérodynamique profilé soufflerie." : "Search complete! Here is the windproof aerodynamic helmet and glove selections.",
                               "velo-helmet"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Casque Aéro & Équipements" : "Helmets & Safety gear"}</span>
                           </button>
                         )}
@@ -983,10 +982,10 @@ export default function Chatbot({
                                 ? "La démarche royale sur les crêtes. Nos bottiers de Chamonix proposent de solides bottes en cuir de toscane et des chaussures de trail agiles. Choisissez votre style :"
                                 : "A royal posture on high ridges. Our bootmakers assemble thick Tuscan leather boots and agile trail runners. Choose your format:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🥾 Chaussures d'Exception" : "🥾 Tailored Footwear"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
 
@@ -999,10 +998,10 @@ export default function Chatbot({
                                 ? "Des compagnons indispensables. Nous façonnons des sacs grand volume et des accessoires d'altitude comme des gourdes en inox et des GPS. Choisissez :"
                                 : "Indispensable gear for wilderness. We craft robust high-capacity expedition packs and micro-accessories. Choose class:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🎒 Sacs & Accessoires" : "🎒 Packs & Altitude Gear"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
                       </>
@@ -1019,9 +1018,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Nous vous recommandons vivement les Bottes de Marche Alp-X en Cuir Toscan." : "Search complete! We highly recommend the grand Alp-X Tuscan Leather boots.",
                               "hike-alp-boots"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Bottes Cuir Double Paroi (Alp-X)" : "Leather Boots (Alp-X)"}</span>
                           </button>
                         )}
@@ -1034,9 +1033,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici notre sélection de chaussures de foulée agile pour sentier d'été." : "Search complete! Here is our selection of fast paced mountain trial runners.",
                               "hike-trail-shoes"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Trail & Marche Active" : "Light Trekking Runners"}</span>
                           </button>
                         )}
@@ -1054,9 +1053,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici le sac d'expédition ultime Olympus Pack (890 €)." : "Search complete! Our ultimate highlight is the high capacity Olympus Expedition Pack.",
                               "hike-pack-volume"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Sacs Haute Capacité (Olympus)" : "Expedition Sack (Olympus)"}</span>
                           </button>
                         )}
@@ -1069,9 +1068,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Nous avons réuni la gourde inox double paroi et la montre GPS Coros Pace." : "Search complete! We isolated our premium titanium GPS watch and direct double-walled flask.",
                               "hike-pack-accessories"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "GPS, Gourdes & Instruments" : "GPS Watch & Flasks"}</span>
                           </button>
                         )}
@@ -1091,10 +1090,10 @@ export default function Chatbot({
                                 ? "L'orfèvrerie mécanique. Notre atelier usine des rameurs en hêtre et des tapis de course pliants ultra-silencieux. Choisissez votre machine :"
                                 : "Master woodworking mechanics. Our workshop builds luxury ashwood water rowers and whisper-silent smart runners. Select your machine:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🛶 Machines Nobles (Rameurs...)" : "🛶 Noble Wood Machines"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
 
@@ -1107,10 +1106,10 @@ export default function Chatbot({
                                 ? "L'essence de l'entrainement. Nous forgeons des haltères en acier et tissons des tapis de Yoga haute densité. Sélectionnez votre intérêt :"
                                 : "The essence of fitness. We forge solid steel dumbbells and weave high-compliance yoga supports. Select your focus:"
                             )}
-                            className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] text-xs font-serif font-black text-[#2E2218] uppercase tracking-wider transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                            className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                           >
                             <span>{currentLang === "FR" ? "🏋️ Haltères & Yoga" : "🏋️ Muscle Weight & Yoga"}</span>
-                            <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                            <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                           </button>
                         )}
                       </>
@@ -1127,9 +1126,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici l'Altis Woodrower Connecté en Frêne/Hêtre massif d'exception." : "Search complete! This is the ultimate woodrower water trainer with real-time feedback.",
                               "fitness-rower-wood"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Rameur en Bois Noble (Woodrower)" : "Lux Beechwood Woodrower"}</span>
                           </button>
                         )}
@@ -1142,9 +1141,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici le Tapis de Course Atlis RUN500 à amorti actif de Chamonix." : "Search complete! Highlighted is our premium active-absorption RUN500 treadmill.",
                               "fitness-treadmill"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Tapis de Course Actif (Atlis RUN)" : "Whisper Run treadmill"}</span>
                           </button>
                         )}
@@ -1162,9 +1161,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici notre kit d'haltères et poids de précision d'Atlis." : "Search complete! Here are our high-precision heavy training steel weight dumbbells.",
                               "fitness-dumbbells"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-neutral-850 hover:text-[#A37E2C] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Haltères & Musculation" : "Weights & Conditioning steel"}</span>
                           </button>
                         )}
@@ -1177,9 +1176,9 @@ export default function Chatbot({
                               currentLang === "FR" ? "Analyse terminée ! Voici notre tapis de protection et confort corporel en mousse d'Olympe." : "Search complete! Safeguard your ground exercise with our premium high density yoga mat.",
                               "fitness-yoga"
                             )}
-                            className="w-full text-left p-3 bg-white border border-[#A37E2C]/50 hover:border-[#A37E2C] text-xs font-sans font-bold transition-all rounded-xl cursor-pointer flex items-center gap-1"
+                            className="w-full text-left p-4 sm:p-5 bg-white border-2 border-[#A37E2C]/50 hover:border-[#A37E2C] text-sm sm:text-base font-sans font-extrabold text-[#2E2218] transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center gap-3.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5 text-[#A37E2C] shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             <span>{currentLang === "FR" ? "Tapis Yoga & Gym" : "Yoga Mats & Core floor"}</span>
                           </button>
                         )}
@@ -1209,10 +1208,10 @@ export default function Chatbot({
                                 currentLang === "FR" ? opt.labelFR : opt.labelEN,
                                 opt.filter
                               )}
-                              className="w-full text-left p-3 bg-neutral-50 border border-neutral-200 hover:border-[#A37E2C] hover:shadow-xs text-xs font-sans font-bold text-neutral-800 hover:text-[#A37E2C] transition-all rounded-xl cursor-pointer flex items-center justify-between"
+                              className="w-full text-left p-4 sm:p-5 bg-neutral-50 border-2 border-neutral-300 hover:border-[#A37E2C] hover:bg-white text-sm sm:text-base font-sans font-extrabold text-[#2E2218]/95 transition-all rounded-2xl shadow-md hover:scale-[1.02] cursor-pointer flex items-center justify-between gap-4"
                             >
                               <span>{currentLang === "FR" ? opt.labelFR : opt.labelEN}</span>
-                              <ArrowRight className="w-4 h-4 text-[#A37E2C]" />
+                              <ArrowRight className="w-5 h-5 text-[#A37E2C] shrink-0" />
                             </button>
                           ))
                         }
@@ -1248,20 +1247,20 @@ export default function Chatbot({
                         ? "Posez votre question sur-mesure à l'artisan (ex: vélo électrique/mécanique, budget, performance, taille...)"
                         : "Ask our master artisan anything (e.g. electric vs mechanical, budget vs performance vs aesthetics, size)..."
                     }
-                    className="flex-1 bg-transparent px-4 py-3.5 text-xs md:text-sm font-semibold outline-none text-[#131211] placeholder-neutral-400 pr-24"
+                    className="flex-1 bg-transparent px-4 py-3.5 text-sm md:text-base font-semibold outline-none text-[#131211] placeholder-neutral-400 pr-24"
                   />
                   <button
                     type="submit"
                     disabled={isLoading || !inputVal.trim()}
-                    className="absolute right-2 px-3 py-1.5 bg-[#2E2218] hover:bg-[#A37E2C] disabled:bg-neutral-200 text-white rounded-lg text-[10px] uppercase tracking-widest font-mono font-black transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                    className="absolute right-2 px-3.5 py-1.5 bg-[#2E2218] hover:bg-[#A37E2C] disabled:bg-neutral-200 text-white rounded-lg text-xs uppercase tracking-wider font-mono font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0"
                   >
                     <span>{currentLang === "FR" ? "Envoyer" : "Send"}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="flex items-center justify-between text-[9px] text-[#A37E2C] font-mono mt-1.5 px-1">
-                  <span>💎 Salon virtuel de Chamonix — Conseils personnalisés d'Atelier</span>
-                  <span>Maison Atlis AI v3.5 • Pressez Entrée</span>
+                <div className="flex flex-col sm:flex-row gap-1 items-center justify-between text-[11px] text-[#A37E2C] font-mono mt-2 px-1">
+                  <span>💎 Salon virtuel de Chamonix — Conseils d'Atelier</span>
+                  <span>Maison Atlis AI v3.5 • Entrée</span>
                 </div>
               </form>
 

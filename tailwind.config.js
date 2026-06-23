@@ -19,7 +19,7 @@ export default {
       },
       fontFamily: {
         serif: ["Dongle", "Playfair Display", "Didot", "Georgia", "serif"],
-        sans: ["Dongle", "Cormorant Garamond", "Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "Courier New", "monospace"],
       },
       scale: {
