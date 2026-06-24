@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Product } from "../types";
 import { Star, Scale, Heart } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
+import { formatPrice } from "../utils/translator";
 
 interface ProductCardProps {
   product: Product;
@@ -95,49 +96,49 @@ const ProductCard = memo(function ProductCard({
       </div>
 
       {/* Card Body */}
-      <div className="flex-1 p-5 flex flex-col justify-between space-y-4">
-        <div className="space-y-2.5">
+      <div className="flex-1 p-4 flex flex-col justify-between space-y-3">
+        <div className="space-y-1.5">
           {/* Category */}
-          <div className="flex items-center justify-between">
-            <span className="text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-[#A37E2C]">
-              {product.category === "aerodynamisme" 
-                ? (currentLang === "FR" ? "VÉLO / CYCLISME" : "BIKE / CYCLING") 
-                : product.category === "exploration-sauvage" 
-                ? (currentLang === "FR" ? "RANDONNÉE / OUTDOOR" : "HIKING / OUTDOOR") 
-                : (currentLang === "FR" ? "TRAINING / FITNESS" : "TRAINING / FITNESS")}
-            </span>
-            
-            {/* Reviews */}
-            <div className="flex items-center gap-1">
+          <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-[#A37E2C] block">
+            {product.category === "aerodynamisme" 
+              ? (currentLang === "DE" ? "RADSPORT / ZUBEHÖR" : (currentLang === "EN" ? "BIKE / CYCLING" : "VÉLO / CYCLISME")) 
+              : product.category === "exploration-sauvage" 
+              ? (currentLang === "DE" ? "WANDERN / OUTDOOR" : (currentLang === "EN" ? "HIKING / OUTDOOR" : "RANDONNÉE / OUTDOOR")) 
+              : (currentLang === "DE" ? "FITNESS / TRAINING" : (currentLang === "EN" ? "TRAINING / FITNESS" : "TRAINING / FITNESS"))}
+          </span>
+          
+          {/* Reviews */}
+          <div className="flex items-center gap-1.5">
+            <div className="flex items-center">
               <Star className="w-3.5 h-3.5 fill-[#A37E2C] text-[#A37E2C]" />
-              <span className="text-xs sm:text-sm font-bold font-mono text-[#131211]">
-                {rating.toFixed(1)}
-              </span>
-              <span className="text-xs sm:text-sm text-neutral-500 font-sans">
-                ({reviewsCount})
-              </span>
             </div>
+            <span className="text-xs font-bold font-mono text-[#131211]">
+              {rating.toFixed(1)}
+            </span>
+            <span className="text-xs text-neutral-500 font-sans">
+              ({reviewsCount})
+            </span>
           </div>
 
           {/* Title */}
-          <h3 className="text-xl sm:text-[22px] font-serif font-semibold text-[#131211] group-hover:text-[#A37E2C] transition-colors leading-tight">
+          <h3 className="text-base sm:text-lg font-serif font-semibold text-[#131211] group-hover:text-[#A37E2C] transition-colors leading-tight pt-1">
             {product.name}
           </h3>
         </div>
 
         {/* Price Only */}
-        <div className="pt-3 border-t border-neutral-300/20 flex items-center justify-between">
+        <div className="pt-2 border-t border-neutral-300/20 flex items-center justify-between">
           <div>
-            <p className="text-[11px] sm:text-xs uppercase tracking-widest text-[#A37E2C] font-semibold">
+            <p className="text-[10px] uppercase tracking-widest text-[#A37E2C] font-semibold">
               {currentLang === "FR" ? "Prix" : "Price"}
             </p>
-            <p className="text-lg sm:text-xl font-serif font-black text-[#2E2218] tracking-tight whitespace-nowrap">
-              {product.price.toLocaleString()} €
+            <p className="text-base sm:text-lg font-serif font-black text-[#2E2218] tracking-tight whitespace-nowrap">
+              {formatPrice(product.price, currentLang)}
             </p>
           </div>
           
           <div className="flex items-center gap-2">
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.15em] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               {currentLang === "FR" ? "Découvrir →" : "Discover →"}
             </span>
           </div>

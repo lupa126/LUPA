@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Scale, ShoppingBag, Eye, AlertCircle, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Sparkles, FileText, Cpu, Ruler } from "lucide-react";
 import { Product } from "../types";
+import { formatPrice } from "../utils/translator";
 
 interface ProductComparisonDockProps {
   comparedProducts: Product[];
@@ -20,8 +21,18 @@ export function ProductComparisonDock({
   warningMessage,
 }: ProductComparisonDockProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const maxLimit = isMobile ? 2 : 4;
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth || 375 : 375);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1200;
+  const maxLimit = isMobile ? 2 : isTablet ? 3 : 4;
 
   if (comparedProducts.length === 0) return null;
 
@@ -176,6 +187,19 @@ export function ProductComparisonModal({
   onViewDetails,
   currentLang,
 }: ProductComparisonModalProps) {
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth || 375 : 375);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isOpen]);
+
+  const isDesktop = windowWidth >= 1200;
+  const isMobile = windowWidth < 768;
+
   const [isAnalysisCollapsed, setIsAnalysisCollapsed] = useState(false);
   const [isProductsSectionCollapsed, setIsProductsSectionCollapsed] = useState(false);
   const [isSpecTableCollapsed, setIsSpecTableCollapsed] = useState(false);
@@ -228,7 +252,7 @@ export function ProductComparisonModal({
   const radarLabels = [
     { label: currentLang === "FR" ? "Performance" : "Performance", key: "performance" },
     { label: currentLang === "FR" ? "Sensation" : "Sensation", key: "prestige" },
-    { label: currentLang === "FR" ? "Dignité" : "Prestige", key: "craftsmanship" },
+    { label: currentLang === "FR" ? "Finitions" : "Craftsmanship", key: "craftsmanship" },
     { label: currentLang === "FR" ? "Durabilité" : "Durability", key: "durability" },
     { label: currentLang === "FR" ? "Confort" : "Comfort", key: "comfort" },
   ];
@@ -274,7 +298,7 @@ export function ProductComparisonModal({
     checkMore("comfort", "Niveau de confort", "Comfort Index");
     checkMore("durability", "Résistance & Garantie", "Durability Assurance");
     checkMore("craftsmanship", "Finition et assemblage", "Craftsmanship Quality");
-    checkMore("prestige", "Indice de prestige", "Prestige Factor");
+    checkMore("prestige", "Indice de sensation", "Sensation Factor");
 
     // Fallback if not absolute winner in specific stats: grab top stats
     if (facts.length < 4) {
@@ -298,8 +322,11 @@ export function ProductComparisonModal({
   const winnerFacts = generateWinnerFacts();
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-md flex items-center justify-center p-3 md:p-6 animate-fade-in">
-      <div className="relative w-full max-w-[95vw] xl:max-w-7xl bg-[#FAF9F4] text-[#131211] shadow-2xl border border-neutral-300/40 rounded-xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-3 md:p-6 animate-fade-in">
+      {/* Clickable Backdrop */}
+      <div className="absolute inset-0 cursor-pointer touch-none" onClick={onClose} />
+      
+      <div className="relative w-full max-w-[95vw] xl:max-w-7xl bg-[#FAF9F4] text-[#131211] shadow-2xl border border-neutral-300/40 rounded-xl flex flex-col max-h-[92vh] overflow-hidden z-10">
         
         {/* Header */}
         <div className="px-6 py-5 border-b-2 border-neutral-200 bg-neutral-100 flex items-center justify-between">
@@ -307,10 +334,7 @@ export function ProductComparisonModal({
             <Scale className="w-6 h-6 text-[#A37E2C]" />
             <div>
               <span className="font-sans font-extrabold tracking-wider text-base sm:text-xl uppercase text-[#2E2218] block leading-tight">
-                {currentLang === "FR" ? "COMPARAISON DE PRODUITS PRESTIGE" : "PREMIUM PRODUCT COMPARISON"}
-              </span>
-              <span className="text-[11px] text-neutral-600 font-mono tracking-widest block uppercase font-bold mt-0.5">
-                Maison Atlis — Versus Intelligence Engine
+                {currentLang === "FR" ? "COMPARAISON DE PRODUITS" : "PRODUCT COMPARISON"}
               </span>
             </div>
           </div>
@@ -325,7 +349,7 @@ export function ProductComparisonModal({
         </div>
 
         {/* Content Box (Scrollable Content panel mimicking Versus.com) */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 overscroll-contain">
           {comparedProducts.length < 2 ? (
             <div className="py-20 text-center space-y-4">
               <span className="text-5xl text-neutral-300 inline-block rotate-12">⚖️</span>
@@ -367,14 +391,19 @@ export function ProductComparisonModal({
 
                 {!isProductsSectionCollapsed && (
                   <div className="mt-4 pt-4 border-t border-neutral-100 overflow-x-auto pb-2 scrollbar-thin animate-fade-in font-sans">
-                    <div className="min-w-0 grid [--first-col-width:55px] xs:[--first-col-width:110px] sm:[--first-col-width:145px] md:[--first-col-width:185px] [--col-min-width:125px] xs:[--col-min-width:160px] sm:[--col-min-width:210px] md:[--col-min-width:260px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
+                    <div 
+                      className="min-w-0 grid" 
+                      style={{ 
+                        gridTemplateColumns: isDesktop
+                          ? `185px repeat(${comparedProducts.length}, minmax(260px, 1fr))`
+                          : `repeat(${comparedProducts.length}, minmax(${isMobile ? "125px" : "210px"}, 1fr))`
+                      }}
+                    >
                       
-                      {/* Outer column indicator */}
-                      <div className="flex flex-col justify-end pb-4 pr-1 sm:pr-4 border-r border-neutral-100">
-                        <p className="font-serif font-black text-[8px] xs:text-[10px] sm:text-xs md:text-sm text-[#2E2218] mt-1.5 tracking-tight uppercase leading-none">
-                          {currentLang === "FR" ? "VERSUS" : "VERSUS"}
-                        </p>
-                      </div>
+                      {/* Outer column indicator - Empty spacer on desktop, hidden on mobile/tablet */}
+                      {isDesktop && (
+                        <div className="flex flex-col justify-end pb-4 pr-4 border-r border-neutral-100" />
+                      )}
 
                       {/* Product side-by-side columns */}
                       {resolvedProductsWithStats.map((item, idx) => {
@@ -396,16 +425,26 @@ export function ProductComparisonModal({
 
                             {/* Top Points Bubble (Score Circle like Image 1) */}
                             <div className="flex items-center gap-1 sm:gap-3 mb-2 sm:mb-4">
-                              <div className="relative w-8 h-8 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-neutral-100 flex items-center justify-center p-0.5 sm:p-1 border border-neutral-300 shadow-md">
-                                <span className="text-[9px] xs:text-xs sm:text-sm md:text-sm font-black font-mono text-[#131211] leading-none block">
+                              <div className={`relative ${isWinner ? "w-11 h-11 xs:w-16 xs:h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-br from-amber-100 to-yellow-200 border-2 border-amber-500 shadow-lg scale-110" : "w-8 h-8 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-neutral-100 border border-neutral-300 shadow-md"} rounded-full flex items-center justify-center p-0.5 sm:p-1 transition-all`}>
+                                <span className={`${isWinner ? "text-xs xs:text-base sm:text-lg md:text-xl font-extrabold" : "text-[9px] xs:text-xs sm:text-sm md:text-sm font-black"} font-mono text-[#131211] leading-none block`}>
                                   {stats.score}
                                 </span>
+                                {isWinner && (
+                                  <div className="absolute -top-3.5 -right-2 text-lg xs:text-2xl sm:text-3xl animate-bounce" title={currentLang === "FR" ? "Gagnant" : "Winner"}>
+                                    🏆
+                                  </div>
+                                )}
                               </div>
                               
                               <div className="text-left hidden xs:block">
                                 <span className={`text-[8px] md:text-[9px] uppercase tracking-wider font-mono font-black block ${colorSet.text}`}>
                                   {p.categoryLabel}
                                 </span>
+                                {isWinner && (
+                                  <span className="text-[7px] xs:text-[8px] sm:text-[9px] uppercase tracking-wider text-amber-600 font-mono font-black block">
+                                    {currentLang === "FR" ? "★ GAGNANT" : "★ WINNER"}
+                                  </span>
+                                )}
                               </div>
                             </div>
 
@@ -428,22 +467,23 @@ export function ProductComparisonModal({
                               
                               {/* COMPARISON WINNER BADGE overlay like Image 1 */}
                               {isWinner && (
-                                <div className="absolute -bottom-1.5 bg-gradient-to-r from-red-500 to-orange-500 text-white font-mono font-black text-[7px] sm:text-[9.5px] uppercase tracking-widest px-2 py-0.5 rounded-full shadow-md border border-white">
-                                  WIN🏆
+                                <div className="absolute -bottom-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white font-mono font-black text-[9px] xs:text-xs sm:text-sm uppercase tracking-widest px-3 py-1 rounded-full shadow-lg border-2 border-white flex items-center gap-1 z-10 animate-pulse">
+                                  <span className="text-xs xs:text-sm sm:text-base">🏆</span>
+                                  <span className="text-[7px] xs:text-[10px] sm:text-xs">{currentLang === "FR" ? "GAGNANT" : "WINNER"}</span>
                                 </div>
                               )}
                             </div>
 
                             {/* Product Title text size auto-scales as requested */}
-                            <h4 className="text-[10px] xs:text-sm sm:text-base md:text-base font-black text-[#131211] font-serif hover:text-[#A37E2C] transition-colors line-clamp-2 max-w-[105px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[210px] min-h-[2.25rem] sm:min-h-[3rem] leading-snug mb-1.5 uppercase tracking-wide">
+                            <h4 className="text-sm xs:text-base sm:text-lg md:text-lg font-black text-[#131211] font-serif hover:text-[#A37E2C] transition-colors line-clamp-2 max-w-[105px] xs:max-w-[150px] sm:max-w-[180px] md:max-w-[210px] min-h-[2.5rem] sm:min-h-[3rem] leading-snug mb-1.5 uppercase tracking-wide">
                               {p.name}
                             </h4>
 
                             {/* Custom Price Capsule like Image 1 (Significantly increased size on mobile) */}
                             <div className="mt-1 w-full max-w-[105px] xs:max-w-[145px] sm:max-w-[170px] md:max-w-[190px]">
                               <div className="bg-neutral-100 border border-neutral-300 hover:border-[#A37E2C] px-1.5 py-1 xs:px-3 xs:py-1 sm:px-4 sm:py-1.5 rounded-full flex items-center justify-between transition-all shadow-sm">
-                                <span className="font-serif font-black text-[10px] xs:text-xs sm:text-sm md:text-lg text-[#2E1818]/90 whitespace-nowrap">
-                                  {p.price.toLocaleString()} €
+                                <span className="font-serif font-black text-lg xs:text-xl sm:text-xl md:text-2xl text-[#2E1818]/90 whitespace-nowrap">
+                                  {formatPrice(p.price, currentLang)}
                                 </span>
                                 <span className="text-[7px] sm:text-[8.5px] uppercase tracking-wider text-[#A37E2C] font-mono font-black hidden md:inline ml-1">
                                   Atlis
@@ -593,9 +633,14 @@ export function ProductComparisonModal({
                       <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[10px] font-mono">
                         {resolvedProductsWithStats.map((item, idx) => {
                           const colorSet = candidateColors[idx % candidateColors.length];
+                          const isW = winner && winner.product.id === item.product.id;
                           return (
-                            <div key={item.product.id} className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: colorSet.stroke }} />
+                            <div key={item.product.id} className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full ${isW ? "bg-amber-100/80 border border-amber-300 scale-105" : ""}`}>
+                              {isW ? (
+                                <span className="text-xs">🏆</span>
+                              ) : (
+                                <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: colorSet.stroke }} />
+                              )}
                               <span className="font-extrabold text-[#131211]">{item.stats.score} pts:</span>
                               <span className="text-neutral-800 font-bold line-clamp-1 max-w-[85px]">{item.product.name}</span>
                             </div>
@@ -608,9 +653,11 @@ export function ProductComparisonModal({
                     {/* Key superiority checklist board (lg:col-span-7) */}
                     <div className="lg:col-span-7 bg-white border border-neutral-200/90 rounded-xl p-5 flex flex-col justify-between shadow-sm">
                       <div>
-                        <h3 className="text-sm font-serif font-black uppercase tracking-wider text-[#131211] pb-3 border-b border-neutral-100">
-                          {currentLang === "FR" 
-                            ? `Pourquoi ${winner?.product.name} domine cet atelier ?` 
+                        <h3 className="text-base sm:text-lg md:text-xl font-serif font-black uppercase tracking-wider text-[#131211] pb-3 border-b border-neutral-150">
+                          {currentLang === "DE"
+                            ? `Warum überragt ${winner?.product.name} diese Auswahl?`
+                            : (currentLang === "FR" || currentLang === "CH")
+                            ? `Pourquoi ${winner?.product.name} domine cet atelier ?`
                             : `Why is ${winner?.product.name} better than the others?`}
                         </h3>
 
@@ -635,7 +682,7 @@ export function ProductComparisonModal({
 
                       <div className="bg-neutral-50/80 border border-neutral-350 rounded-lg p-3.5 mt-5">
                         <p className="text-[11px] font-mono text-neutral-850 uppercase font-black tracking-wider mb-1">
-                          {currentLang === "FR" ? "Évaluation Synthétique" : "Prestige Verdict"}
+                          {currentLang === "FR" ? "Évaluation Synthétique" : "Atelier Verdict"}
                         </p>
                         <p className="text-xs text-[#131211] leading-relaxed font-bold">
                           {currentLang === "FR"
@@ -673,8 +720,34 @@ export function ProductComparisonModal({
 
                 {!isSpecTableCollapsed && (
                   <div className="mt-4 pt-4 border-t border-neutral-100 overflow-x-auto pb-2 scrollbar-thin animate-fade-in font-sans">
-                    <div className="min-w-0 grid [--first-col-width:55px] xs:[--first-col-width:110px] sm:[--first-col-width:145px] md:[--first-col-width:185px] [--col-min-width:125px] xs:[--col-min-width:160px] sm:[--col-min-width:210px] md:[--col-min-width:260px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
+                    <div 
+                      className="min-w-0 grid" 
+                      style={{ 
+                        gridTemplateColumns: isDesktop
+                          ? `185px repeat(${comparedProducts.length}, minmax(260px, 1fr))`
+                          : `repeat(${comparedProducts.length}, minmax(${isMobile ? "125px" : "210px"}, 1fr))`
+                      }}
+                    >
                     
+                    {/* Dedicated side-by-side Product Images Row to fill empty space and provide clear column reference */}
+                    {isDesktop && (
+                      <div className="border-b-2 border-neutral-200/45 bg-neutral-100/30 p-2 sm:p-4 flex items-center justify-center">
+                        <span className="text-xs font-mono font-black text-neutral-450 uppercase tracking-wider">
+                          {currentLang === "FR" ? "Créations" : "Creations"}
+                        </span>
+                      </div>
+                    )}
+                    {comparedProducts.map((p) => (
+                      <div key={`spec-image-${p.id}`} className="border-b-2 border-neutral-200/40 bg-neutral-50/20 p-2 sm:p-4 flex flex-col items-center justify-center gap-2">
+                        <div className="w-12 h-12 xs:w-16 xs:h-16 bg-white border border-neutral-200/80 p-1 rounded-lg flex items-center justify-center shadow-sm">
+                          <img src={p.image} alt={p.name} className="max-w-full max-h-full object-contain" />
+                        </div>
+                        <span className="text-[9px] xs:text-xs font-mono font-black text-[#131211] line-clamp-1 text-center w-full uppercase tracking-tight">
+                          {p.name}
+                        </span>
+                      </div>
+                    ))}
+
                     {/* Atout Clé Row */}
                     <button
                       onClick={() => setIsAtoutCleCollapsed(!isAtoutCleCollapsed)}
@@ -687,9 +760,11 @@ export function ProductComparisonModal({
                       </div>
                       {isAtoutCleCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
-                    <div className={`border-b-2 border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isAtoutCleCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
-                      {!isAtoutCleCollapsed && <Sparkles className="w-4 h-4 text-[#A37E2C]" />}
-                    </div>
+                    {isDesktop && (
+                      <div className={`border-b-2 border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isAtoutCleCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
+                        {/* Empty cell */}
+                      </div>
+                    )}
                     {comparedProducts.map((p) => {
                       const isBestBudget = p.price === minPrice;
                       const isBestRating = (p.reviews?.notation || 4.8) === maxRating;
@@ -754,9 +829,11 @@ export function ProductComparisonModal({
                       </div>
                       {isDescriptionCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
-                    <div className={`border-b-2 border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isDescriptionCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
-                      {!isDescriptionCollapsed && <FileText className="w-4 h-4 text-neutral-400" />}
-                    </div>
+                    {isDesktop && (
+                      <div className={`border-b-2 border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isDescriptionCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
+                        {/* Empty cell */}
+                      </div>
+                    )}
                     {comparedProducts.map((p) => (
                       <div 
                         key={p.id} 
@@ -782,9 +859,11 @@ export function ProductComparisonModal({
                       </div>
                       {isTechnicalCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
-                    <div className={`border-b-2 border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isTechnicalCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
-                      {!isTechnicalCollapsed && <Cpu className="w-4 h-4 text-neutral-400" />}
-                    </div>
+                    {isDesktop && (
+                      <div className={`border-b-2 border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isTechnicalCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
+                        {/* Empty cell */}
+                      </div>
+                    )}
                     {comparedProducts.map((p) => (
                       <div 
                         key={p.id} 
@@ -822,9 +901,11 @@ export function ProductComparisonModal({
                       </div>
                       {isSizesCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
-                    <div className={`border-b border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isSizesCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
-                      {!isSizesCollapsed && <Ruler className="w-4 h-4 text-neutral-400" />}
-                    </div>
+                    {isDesktop && (
+                      <div className={`border-b border-neutral-200/40 bg-neutral-50/10 flex items-center justify-center ${isSizesCollapsed ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" : "p-1.5 sm:p-5"}`}>
+                        {/* Empty cell */}
+                      </div>
+                    )}
                     {comparedProducts.map((p) => (
                       <div 
                         key={p.id} 
@@ -857,20 +938,31 @@ export function ProductComparisonModal({
                 </div>
                 
                 <div className="overflow-x-auto pb-2 scrollbar-thin font-sans">
-                  <div className="min-w-0 grid [--first-col-width:55px] xs:[--first-col-width:110px] sm:[--first-col-width:145px] md:[--first-col-width:185px] [--col-min-width:125px] xs:[--col-min-width:160px] sm:[--col-min-width:210px] md:[--col-min-width:260px]" style={{ gridTemplateColumns: `var(--first-col-width, 165px) repeat(${comparedProducts.length}, minmax(var(--col-min-width, 230px), 1fr))` }}>
+                  <div 
+                    className="min-w-0 grid" 
+                    style={{ 
+                      gridTemplateColumns: isDesktop
+                        ? `185px repeat(${comparedProducts.length}, minmax(260px, 1fr))`
+                        : `repeat(${comparedProducts.length}, minmax(${isMobile ? "125px" : "210px"}, 1fr))`
+                    }}
+                  >
                     
-                    <div className="p-1 sm:p-4 font-extrabold text-[8px] xs:text-sm text-[#2E2218] uppercase tracking-wider flex items-center pr-1 border-r border-neutral-100/70">
-                      {currentLang === "FR" ? "OPTION" : "OPTION"}
-                    </div>
+                    {isDesktop && (
+                      <div className="p-1 sm:p-4 border-r border-neutral-100/70" />
+                    )}
                     {comparedProducts.map((p) => (
                       <div key={p.id} className="p-1 sm:p-4 text-center flex flex-col items-center justify-center gap-2 border-l border-neutral-100 first:border-l-0">
+                        {/* Side-by-side Product Image for clear reference */}
+                        <div className="w-12 h-12 xs:w-16 xs:h-16 bg-white border border-neutral-200 p-1 rounded-lg flex items-center justify-center shadow-sm shrink-0 mb-1">
+                          <img src={p.image} alt={p.name} className="max-w-full max-h-full object-contain" />
+                        </div>
                         {/* Bottom product context panel info */}
                         <div className="w-full text-center pb-2 mb-1 border-b border-neutral-100/70">
                           <p className="text-[10px] xs:text-xs font-sans font-black text-[#131211] uppercase tracking-tight line-clamp-2 min-h-[1.75rem] sm:min-h-[2.25rem] flex items-center justify-center px-0.5 sm:px-1" title={p.name}>
                             {p.name}
                           </p>
                           <p className="text-[9px] xs:text-[11px] font-mono font-bold text-[#A37E2C] mt-1 bg-[#A37E2C]/5 rounded py-0.5 px-1.5 inline-block">
-                            {p.price.toLocaleString()} €
+                            {formatPrice(p.price, currentLang)}
                           </p>
                         </div>
 
@@ -907,8 +999,8 @@ export function ProductComparisonModal({
         {/* Footer */}
         {comparedProducts.length >= 2 && (
           <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-100/50 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-3">
-            <span className="font-mono">
-              Maison Atlis Chamonix — {comparedProducts.length} créations comparées
+            <span className="font-sans font-bold text-neutral-700">
+              {comparedProducts.length} {currentLang === "FR" ? "produits comparés" : "products compared"}
             </span>
             <button
               onClick={onClose}

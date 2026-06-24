@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CartItem } from "../types";
 import { Trash2, ShieldCheck, Mail, CreditCard, ChevronRight } from "lucide-react";
+import { formatPrice } from "../utils/translator";
 
 interface FullCartDetailsModalProps {
   isOpen: boolean;
@@ -61,11 +62,14 @@ export default function FullCartDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-md flex items-center justify-center p-4 md:p-6 animate-fade-in">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-md flex items-center justify-center p-4 md:p-6 animate-fade-in">
+      {/* Clickable Backdrop */}
+      <div className="absolute inset-0 cursor-pointer touch-none" onClick={onClose} />
+      
       {/* Container Card mimicking Amazon Layout but dressed in high fashion */}
       <div 
         id="full-cart-container"
-        className="relative w-full max-w-6xl bg-[#FAF9F4] text-[#131211] shadow-2xl rounded-lg border border-neutral-300/40 flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-6xl bg-[#FAF9F4] text-[#131211] shadow-2xl rounded-lg border border-neutral-300/40 flex flex-col max-h-[90vh] overflow-hidden z-10"
       >
         {/* Modal Header */}
         <div className="p-5 md:p-6 border-b border-neutral-200 bg-white flex items-center justify-between">
@@ -84,7 +88,7 @@ export default function FullCartDetailsModal({
         </div>
 
         {/* Modal Content - Two Column layout */}
-        <div className="flex-1 overflow-y-auto p-5 md:p-8">
+        <div className="flex-1 overflow-y-auto p-5 md:p-8 overscroll-contain">
           {successMode ? (
             /* Success screen state */
             <div className="max-w-2xl mx-auto py-12 text-center space-y-6">
@@ -116,12 +120,12 @@ export default function FullCartDetailsModal({
                     <span className="truncate max-w-[280px]">
                       {item.product.name} {item.selectedSize ? `(${item.selectedSize})` : ""} × {item.quantity}
                     </span>
-                    <span className="font-mono">{(item.product.price * item.quantity).toLocaleString()} €</span>
+                    <span className="font-mono">{formatPrice(item.product.price * item.quantity, currentLang)}</span>
                   </div>
                 ))}
                 <div className="pt-3 border-t border-neutral-200 flex justify-between items-center text-sm font-bold">
                   <span>{currentLang === "FR" ? "Valeur totale estimée" : "Total Estimated Value"}</span>
-                  <span className="text-[#A37E2C] font-mono text-base">{totalAmount.toLocaleString()} €</span>
+                  <span className="text-[#A37E2C] font-mono text-base">{formatPrice(totalAmount, currentLang)}</span>
                 </div>
               </div>
 
@@ -350,12 +354,11 @@ export default function FullCartDetailsModal({
                         {/* Absolute right column detailing exact price */}
                         <div className="shrink-0 text-right sm:pt-2">
                           <span className="text-base sm:text-lg font-bold text-neutral-950 font-mono">
-                            {item.product.price.toLocaleString()}
-                            <sup className="text-[10px] ml-0.5 font-normal">,00</sup> €
+                            {formatPrice(item.product.price, currentLang)}
                           </span>
                           {item.quantity > 1 && (
                             <p className="text-[10px] text-neutral-400 font-mono">
-                              ({(item.product.price).toLocaleString()} € / {currentLang === "FR" ? "unité" : "unit"})
+                              ({formatPrice(item.product.price, currentLang)} / {currentLang === "FR" ? "unité" : "unit"})
                             </p>
                           )}
                         </div>
@@ -373,8 +376,7 @@ export default function FullCartDetailsModal({
                     </span>{" "}
                     :{" "}
                     <span className="text-lg md:text-xl font-bold font-mono text-neutral-900">
-                      {totalAmount.toLocaleString()}
-                      <sup className="text-xs font-normal">,00</sup> €
+                      {formatPrice(totalAmount, currentLang)}
                     </span>
                   </p>
                 </div>
@@ -411,10 +413,10 @@ export default function FullCartDetailsModal({
 
                   <div className="flex justify-between items-baseline font-mono pb-2">
                     <span className="text-sm font-sans font-bold text-neutral-800">
-                      Subtotal:
+                      {currentLang === "FR" ? "Sous-total :" : "Subtotal:"}
                     </span>
                     <span className="text-xl font-black text-[#2E2218]">
-                      {totalAmount.toLocaleString()} €
+                      {formatPrice(totalAmount, currentLang)}
                     </span>
                   </div>
 

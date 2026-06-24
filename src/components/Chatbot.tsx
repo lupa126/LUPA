@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { X, Sparkles, Compass, CheckCircle, ArrowRight, RotateCcw } from "lucide-react";
 import { ChatMessage, Product } from "../types";
+import { formatPrice } from "../utils/translator";
 
 interface ChatbotProps {
   currentLang: string;
@@ -601,7 +602,9 @@ export default function Chatbot({
         >
           <Compass className="w-5 h-5 text-[#A37E2C] group-hover:text-white transition-colors animate-pulse" />
           <span className="text-[11px] uppercase tracking-widest font-black font-mono">
-            {currentLang === "FR" ? "Conseil Virtuel" : "Virtual Advisor"}
+            {currentLang === "DE" 
+              ? "Virtuelle Beratung" 
+              : (currentLang === "FR" || currentLang === "CH" ? "Conseil Virtuel" : "Virtual Advisor")}
           </span>
           {itemsInCart > 0 && (
             <span className="absolute -top-1 -left-1 bg-[#1C2F22] text-[9px] font-bold px-2 py-0.5 rounded-full border border-[#FAF9F4] shadow-md">
@@ -739,7 +742,7 @@ export default function Chatbot({
                               {prod.name}
                             </p>
                             <p className="text-[11px] md:text-xs font-mono font-bold text-[#A37E2C] mt-0.5">
-                              {prod.price.toLocaleString()} €
+                              {formatPrice(prod.price, currentLang)}
                             </p>
                           </div>
                         </div>

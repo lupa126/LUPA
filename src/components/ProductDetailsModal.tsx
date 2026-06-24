@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Product } from "../types";
 import { X, Star, Check, ShoppingBag, ShieldCheck, Heart } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
+import { formatPrice } from "../utils/translator";
 
 interface ProductDetailsModalProps {
   product: Product | null;
@@ -51,11 +52,11 @@ export default function ProductDetailsModal({
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
       <div 
-        className="absolute inset-0 cursor-pointer" 
+        className="absolute inset-0 cursor-pointer touch-none" 
         onClick={onClose} 
       />
       
-      <div className="relative w-full max-w-4xl bg-[#FAF9F4] text-[#131211] shadow-2xl border border-neutral-300/40 grid grid-cols-1 md:grid-cols-2 overflow-hidden animate-fade-in-up z-10 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-4xl bg-[#FAF9F4] text-[#131211] shadow-2xl border border-neutral-300/40 grid grid-cols-1 md:grid-cols-[58%_42%] lg:grid-cols-2 overflow-hidden animate-fade-in-up z-10 max-h-[90vh] overflow-y-auto overscroll-contain">
         
         {/* Close Button: Fixed on mobile viewports for absolute accessibility when scrolling, absolute on desktop */}
         <button
@@ -67,11 +68,11 @@ export default function ProductDetailsModal({
         </button>
 
         {/* Column 1: Image container - Styled to display the full image using object-contain and centering */}
-        <div className="relative h-80 md:h-auto min-h-[350px] bg-neutral-100/60 flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-neutral-200">
+        <div className="relative h-80 md:h-auto min-h-[350px] bg-neutral-100/60 flex items-center justify-center p-6 md:p-3 lg:p-6 border-b md:border-b-0 md:border-r border-neutral-200">
           <img
             src={product.image}
             alt={product.name}
-            className="max-w-full max-h-[320px] md:max-h-[500px] object-contain transition-all duration-300"
+            className="max-w-full max-h-[320px] md:max-h-[520px] lg:max-h-[500px] object-contain transition-all duration-300 md:scale-[1.05] lg:scale-100"
           />
           
           <div className="absolute top-4 left-4 text-[#131211] space-y-1">
@@ -88,11 +89,11 @@ export default function ProductDetailsModal({
         </div>
 
         {/* Column 2: Spec Sheets and Details */}
-        <div className="p-6 md:p-10 flex flex-col justify-between">
-          <div className="space-y-6">
+        <div className="p-6 md:p-5 lg:p-10 flex flex-col justify-between">
+          <div className="space-y-6 md:space-y-3.5 lg:space-y-6">
             
             {/* Header portion */}
-            <div className="space-y-2">
+            <div className="space-y-2 md:space-y-1 lg:space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-[9px] uppercase tracking-[0.25em] text-[#A37E2C] font-bold">
                   {product.categoryLabel}
@@ -105,11 +106,11 @@ export default function ProductDetailsModal({
                 )}
               </div>
               
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#131211] tracking-tight">
+              <h2 className="text-2xl md:text-xl lg:text-3xl font-serif font-bold text-[#131211] tracking-tight">
                 {product.name}
               </h2>
 
-              <div className="flex items-center gap-2 pt-1 border-b border-neutral-300/20 pb-4">
+              <div className="flex items-center gap-2 pt-1 border-b border-neutral-300/20 pb-4 md:pb-2.5 lg:pb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -134,24 +135,30 @@ export default function ProductDetailsModal({
             {/* Price tag */}
             <div className="space-y-1">
               <span className="text-[9px] font-bold tracking-[0.2em] text-neutral-400 uppercase">
-                Valeur d'Acquisition
+                {currentLang === "FR" 
+                  ? "Valeur d'Acquisition" 
+                  : currentLang === "EN" 
+                  ? "Acquisition Value" 
+                  : currentLang === "DE" 
+                  ? "Anschaffungswert" 
+                  : "Valeur d'Acquisition d'Olympe"}
               </span>
-              <p className="text-2xl font-serif font-bold text-[#2E2218]">
-                {product.price.toLocaleString()} €
+              <p className="text-2xl md:text-xl lg:text-2xl font-serif font-bold text-[#2E2218]">
+                {formatPrice(product.price, currentLang)}
               </p>
             </div>
 
             {/* Description */}
-            <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+            <p className="text-xs md:text-[10.5px] lg:text-xs text-neutral-600 leading-relaxed font-sans">
               {product.description}
             </p>
 
             {/* Atelier details list */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#131211]">
+            <div className="space-y-3 md:space-y-2 lg:space-y-3">
+              <p className="text-[10px] md:text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.18em] text-[#131211]">
                 {t.detailsTitle}
               </p>
-              <ul className="space-y-2 text-xs text-neutral-600 border-l border-[#A37E2C]/30 pl-4 py-1">
+              <ul className="space-y-2 md:space-y-1 lg:space-y-2 text-xs md:text-[10.5px] lg:text-xs text-neutral-600 border-l border-[#A37E2C]/30 pl-4 py-1">
                 {product.details.map((detail, idx) => (
                   <li key={idx} className="leading-relaxed">
                     • {detail}
@@ -162,7 +169,7 @@ export default function ProductDetailsModal({
 
             {/* Size Selector */}
             {product.sizes && product.sizes.length > 0 && (
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 md:space-y-1.5 lg:space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className={`text-[9px] uppercase tracking-[0.2em] font-bold block ${sizeError ? "text-[#A37E2C]" : "text-neutral-500"}`}>
                     {t.selectSize} {sizeError && "*"}
@@ -181,7 +188,7 @@ export default function ProductDetailsModal({
                         setSelectedSize(size);
                         setSizeError(false);
                       }}
-                      className={`px-4 py-2 border text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                      className={`px-4 py-2 md:px-3 md:py-1.5 lg:px-4 lg:py-2 border text-xs md:text-[10px] lg:text-xs font-mono font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                         selectedSize === size
                           ? "bg-[#2E2218] border-[#2E2218] text-[#FAF9F4]"
                           : sizeError
@@ -199,10 +206,10 @@ export default function ProductDetailsModal({
           </div>
 
           {/* Action Zone */}
-          <div className="pt-8 mt-6 border-t border-neutral-300/20 flex flex-col sm:flex-row gap-3">
+          <div className="pt-8 md:pt-4 lg:pt-8 mt-6 md:mt-4 lg:mt-6 border-t border-neutral-300/20 flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleAdd}
-              className={`flex-1 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-4 md:py-3 lg:py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
                 added 
                   ? "bg-[#1C2F22] text-[#FAF9F4]" 
                   : "bg-[#2E2218] hover:bg-[#A37E2C] text-[#FAF9F4]"
@@ -223,7 +230,7 @@ export default function ProductDetailsModal({
 
             <button
               onClick={() => onToggleFavorite(product)}
-              className={`p-4 border transition-all duration-250 cursor-pointer rounded-sm hover:scale-105 ${
+              className={`p-4 md:p-3 lg:p-4 border transition-all duration-250 cursor-pointer rounded-sm hover:scale-105 ${
                 isFavorite 
                   ? "border-red-500 text-red-550 bg-red-50/70" 
                   : "border-neutral-300/50 hover:border-[#A37E2C] text-[#131211] bg-white"

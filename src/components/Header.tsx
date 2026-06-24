@@ -4,6 +4,7 @@ import { Product, SearchSuggestion } from "../types";
 import { PRODUCTS } from "../data/products";
 import { TRANSLATIONS } from "../data/translations";
 import AltisLogo from "./AltisLogo";
+import { translateProduct, formatPrice } from "../utils/translator";
 
 interface HeaderProps {
   onSearchSelect: (product: Product) => void;
@@ -21,6 +22,7 @@ interface HeaderProps {
   favorites: Product[];
   onViewProduct: (product: Product) => void;
   onToggleFavorite: (product: Product) => void;
+  onOpenAccount?: () => void;
 }
 
 export default function Header({
@@ -39,6 +41,7 @@ export default function Header({
   favorites,
   onViewProduct,
   onToggleFavorite,
+  onOpenAccount,
 }: HeaderProps) {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const isControlled = searchQueryProp !== undefined;
@@ -127,11 +130,13 @@ export default function Header({
     const query = searchQuery.toLowerCase();
     const suggestionsList: SearchSuggestion[] = [];
 
-    // Filter products
-    const matchingProducts = PRODUCTS.filter(
+    // Filter products translated into the current language
+    const translatedProducts = PRODUCTS.map((p) => translateProduct(p, currentLang));
+    const matchingProducts = translatedProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query)
+        p.description.toLowerCase().includes(query) ||
+        (p.categoryLabel && p.categoryLabel.toLowerCase().includes(query))
     );
 
     matchingProducts.forEach((p) => {
@@ -143,7 +148,7 @@ export default function Header({
     });
 
     setSuggestions(suggestionsList.slice(0, 5));
-  }, [searchQuery]);
+  }, [searchQuery, currentLang]);
 
   const handleFocusSearch = () => {
     setActiveOverlay(true);
@@ -404,7 +409,7 @@ export default function Header({
             </div>
 
             {/* Profile */}
-            <button className="text-white/85 hover:text-[#A37E2C] cursor-pointer transition-colors" title="Accéder au compte">
+            <button onClick={onOpenAccount} className="text-white/85 hover:text-[#A37E2C] cursor-pointer transition-colors" title="Accéder au compte">
               <User className="w-4 h-4" />
             </button>
 
@@ -508,7 +513,7 @@ export default function Header({
                                   {product.categoryLabel}
                                 </p>
                                 <p className="text-xs font-serif font-black text-[#2E2218]">
-                                  {product.price.toLocaleString()} €
+                                  {formatPrice(product.price, currentLang)}
                                 </p>
                               </div>
 

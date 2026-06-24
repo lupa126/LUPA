@@ -116,9 +116,12 @@ export default function ServiceDetailsModal({
   return (
     <div 
       id="service-details-modal"
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-fade-in"
+      className="fixed inset-0 z-50 overflow-hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-fade-in"
     >
-      <div className="relative w-full max-w-4xl bg-[#FAF9F4] text-[#131211] shadow-2xl rounded-xl border border-neutral-300/50 flex flex-col max-h-[90vh] overflow-hidden">
+      {/* Clickable Backdrop */}
+      <div className="absolute inset-0 cursor-pointer touch-none" onClick={onClose} />
+      
+      <div className="relative w-full max-w-4xl bg-[#FAF9F4] text-[#131211] shadow-2xl rounded-xl border border-neutral-300/50 flex flex-col max-h-[90vh] overflow-hidden z-10">
         
         {/* Sticky Header */}
         <div className="p-6 border-b border-neutral-200 bg-white flex items-center justify-between">
@@ -137,7 +140,7 @@ export default function ServiceDetailsModal({
         </div>
 
         {/* Content Container */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 overscroll-contain">
           
           {serviceType === "garantie" && (
             <div className="space-y-8 animate-slide-in">

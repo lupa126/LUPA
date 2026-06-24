@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CartItem } from "../types";
 import { TRANSLATIONS } from "../data/translations";
 import { X, Trash2, ShieldCheck, Mail, CreditCard, ChevronRight } from "lucide-react";
+import { formatPrice } from "../utils/translator";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -43,7 +44,7 @@ export default function CartDrawer({
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity animate-fade-in"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity animate-fade-in touch-none"
         onClick={onClose}
       />
 
@@ -70,7 +71,7 @@ export default function CartDrawer({
 
           {successMode ? (
             /* Succession Celebration Screen */
-            <div className="flex-1 p-8 flex flex-col justify-center text-center space-y-6 overflow-y-auto">
+            <div className="flex-1 p-8 flex flex-col justify-center text-center space-y-6 overflow-y-auto overscroll-contain">
               <div className="w-16 h-16 bg-[#16A34A]/10 border border-[#16A34A] flex items-center justify-center rounded-full mx-auto animate-bounce">
                 <ShieldCheck className="w-8 h-8 text-[#16A34A]" />
               </div>
@@ -97,12 +98,12 @@ export default function CartDrawer({
                     <span className="text-neutral-700 truncate max-w-[180px]">
                       {item.product.name} {item.selectedSize ? `(${item.selectedSize})` : ""} × {item.quantity}
                     </span>
-                    <span className="font-mono text-neutral-600">{(item.product.price * item.quantity).toLocaleString()} €</span>
+                    <span className="font-mono text-neutral-600">{formatPrice(item.product.price * item.quantity, currentLang)}</span>
                   </div>
                 ))}
                 <div className="pt-2 border-t border-neutral-200 flex justify-between items-center text-sm font-bold">
-                  <span>Estimation Totale</span>
-                  <span className="text-[#A37E2C]">{totalAmount.toLocaleString()} €</span>
+                  <span>{currentLang === "FR" ? "Estimation Totale" : "Estimated Total"}</span>
+                  <span className="text-[#A37E2C]">{formatPrice(totalAmount, currentLang)}</span>
                 </div>
               </div>
 
@@ -139,10 +140,10 @@ export default function CartDrawer({
               <div className="p-5 bg-white border-b border-neutral-200 space-y-3.5 shadow-xs">
                 <div className="text-center">
                   <p className="text-xs uppercase tracking-widest text-[#A37E2C] font-extrabold mb-1">
-                    Sous-total
+                    {currentLang === "FR" ? "Sous-total" : "Subtotal"}
                   </p>
                   <p className="text-2xl font-black text-emerald-800 font-mono tracking-tight">
-                    {totalAmount.toLocaleString()} €
+                    {formatPrice(totalAmount, currentLang)}
                   </p>
                   
                   {/* Eligibility check for free transport */}
@@ -163,7 +164,7 @@ export default function CartDrawer({
               </div>
 
               {/* Items List */}
-              <div className="flex-1 overflow-y-auto p-5 divide-y divide-neutral-200/60 bg-neutral-50/50">
+              <div className="flex-1 overflow-y-auto p-5 divide-y divide-neutral-200/60 bg-neutral-50/50 overscroll-contain">
                 {items.map((item) => (
                   <div key={`${item.product.id}-${item.selectedSize || ""}`} className="py-4 flex gap-4 first:pt-0 last:pb-0">
                     
@@ -230,7 +231,7 @@ export default function CartDrawer({
 
                         {/* Individual Item sum value */}
                         <span className="text-xs font-bold text-[#2E2218] font-mono">
-                          {(item.product.price * item.quantity).toLocaleString()} €
+                          {formatPrice(item.product.price * item.quantity, currentLang)}
                         </span>
                       </div>
                     </div>
@@ -285,7 +286,7 @@ export default function CartDrawer({
                       {t.total}
                     </span>
                     <span className="text-base font-bold text-[#2E2218]">
-                      {totalAmount.toLocaleString()} €
+                      {formatPrice(totalAmount, currentLang)}
                     </span>
                   </div>
 

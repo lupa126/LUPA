@@ -9,10 +9,27 @@ import FullCartDetailsModal from "./components/FullCartDetailsModal";
 import ServiceDetailsModal from "./components/ServiceDetailsModal";
 import Chatbot from "./components/Chatbot";
 import AltisLogo from "./components/AltisLogo";
+import AccountModal from "./components/AccountModal";
 import { PRODUCTS } from "./data/products";
+import { translateProductsList } from "./utils/translator";
 import { TRANSLATIONS } from "./data/translations";
 import { Product, CartItem } from "./types";
 import { Sparkles, Award, Shield, Hammer, MapPin, Scale, X } from "lucide-react";
+
+// Format price helper according to chosen language and currency
+function formatRoundPrice(price: number, lang: string): string {
+  const rounded = Math.round(price);
+  if (lang === "CH") {
+    return `${rounded.toLocaleString("de-CH")} CHF`;
+  }
+  if (lang === "EN") {
+    return `£${rounded.toLocaleString("en-US")}`;
+  }
+  if (lang === "DE") {
+    return `${rounded.toLocaleString("de-DE")} €`;
+  }
+  return `${rounded.toLocaleString("fr-FR")} €`;
+}
 
 // Normalization & Typo tolerance search functions
 function cleanString(str: string): string {
@@ -49,61 +66,87 @@ function matchesProductWithTypos(product: Product, query: string): boolean {
   const normalizedQuery = cleanString(query).trim();
   if (!normalizedQuery) return true;
 
-  const queryWords = normalizedQuery.split(/\s+/);
-  
   const nameClean = cleanString(product.name || "");
   const descClean = cleanString(product.description || "");
-  const nameWords = nameClean.split(/\s+/);
-  const descWords = descClean.split(/\s+/);
-  const allWords = [...nameWords, ...descWords];
+  const catLabelClean = cleanString(product.categoryLabel || "");
+  const catClean = cleanString(product.category || "");
+  const specClean = cleanString(product.details?.join(" ") || "");
 
-  return queryWords.every(qw => {
-    // Exact semantic bike/cycling filter if they look up bicycle-related words in French or English
-    if (qw === "velo" || qw === "velos" || qw === "cycle" || qw === "cycles" || qw === "cyclisme") {
-      const isVeloCategory = product.category === "aerodynamisme";
-      const hasVeloKeyword = allWords.some(tw => 
-        tw === "velo" || tw === "velos" || tw === "vtt" || tw === "gravel" || tw === "bicyclette" || tw === "bicyclettes" || tw === "cycling" || tw === "bike" || tw === "bikes" || tw === "cyclisme"
-      );
-      return isVeloCategory || hasVeloKeyword;
-    }
+  const fullProductText = `${nameClean} ${descClean} ${catLabelClean} ${catClean} ${specClean}`;
 
-    // Exact word match
-    if (allWords.some(tw => tw === qw)) {
+  // 1. Direct substring match on the full text
+  if (fullProductText.includes(normalizedQuery)) {
+    return true;
+  }
+
+  // Also strip all spaces from both and check if query is a substring (handles "veloelectrique")
+  const strippedProduct = fullProductText.replace(/\s+/g, "");
+  const strippedQuery = normalizedQuery.replace(/\s+/g, "");
+  if (strippedProduct.includes(strippedQuery)) {
+    return true;
+  }
+
+  // 2. Word-by-word matching with typo tolerance (Levenshtein)
+  const queryWords = normalizedQuery.split(/\s+/).filter(Boolean);
+  const productWords = fullProductText.split(/\s+/).filter(Boolean);
+
+  // Check if ALL query words are matched by at least one product word (or substring of product text)
+  const allWordsMatch = queryWords.every(qw => {
+    // Is it a direct substring of the product name or full text?
+    if (nameClean.includes(qw) || fullProductText.includes(qw)) {
       return true;
     }
 
-    // Plural simple variation matches
-    if (allWords.some(tw => tw === qw + "s" || qw === tw + "s")) {
-      return true;
-    }
-
-    // Default matching logic with word-boundary and prefix constraints
-    return allWords.some(tw => {
-      // Prefix match for longer terms (e.g., "bicyc" -> "bicyclette")
-      if (qw.length >= 4 && tw.startsWith(qw) && tw.length <= qw.length + 3) {
-        // Prevent false positives on common roots
-        if (qw === "velo" && (tw.startsWith("velour") || tw.startsWith("velout"))) {
-          return false;
-        }
+    // Check Levenshtein distance against any word in the product
+    for (const pw of productWords) {
+      // Direct word-to-word match or startsWith / endsWith
+      if (pw === qw || pw.startsWith(qw) || qw.startsWith(pw)) {
         return true;
       }
 
-      // Typo tolerance Levenshtein distance for longer words
-      if (qw.length > 3) {
-        const dist = getLevenshteinDistance(qw, tw);
-        if (dist <= 1) {
-          // Exclude false typo matches that are too common
-          if (qw === "velo" && (tw.includes("envelop") || tw.includes("develop"))) {
-            return false;
-          }
-          return true;
-        }
+      // Levenshtein distance for typo tolerance
+      const maxDist = qw.length > 5 ? 2 : qw.length > 3 ? 1 : 0;
+      if (getLevenshteinDistance(qw, pw) <= maxDist) {
+        return true;
       }
+    }
 
-      return false;
-    });
+    // Custom synonym matching (e.g., "velo" -> "vtt", "gravel", "cycling", "bike", "electrique", etc.)
+    if (qw === "velo" || qw === "bike" || qw === "bicyclette" || qw === "cycling") {
+      const bikeKeywords = ["velo", "vtt", "gravel", "cycling", "bike", "cyclisme", "bicyclette", "aerodynamisme"];
+      if (bikeKeywords.some(bk => fullProductText.includes(bk))) {
+        return true;
+      }
+    }
+
+    return false;
   });
+
+  return allWordsMatch;
 }
+
+const SUB_CATEGORIES: Record<string, Array<{ id: string; label: { FR: string; EN: string }; keywords: string[] }>> = {
+  aerodynamisme: [
+    { id: "electric", label: { FR: "Vélo Électrique", EN: "Electric Bike" }, keywords: ["electrique", "électrique", "assistance", "e-", "electric"] },
+    { id: "gravel", label: { FR: "Gravel", EN: "Gravel" }, keywords: ["gravel", "grvl"] },
+    { id: "route", label: { FR: "Vélo de Route", EN: "Road Bike" }, keywords: ["route", "rc", "course"] },
+    { id: "vtt", label: { FR: "VTT (Tout Terrain)", EN: "Mountain Bike" }, keywords: ["vtt", "terrain", "rockrider", "st "] },
+    { id: "ville", label: { FR: "Vélo de Ville & Pliant", EN: "City & Folding Bike" }, keywords: ["ville", "pliant", "elops", "tilt"] }
+  ],
+  "resistance-active": [
+    { id: "tapis", label: { FR: "Tapis de Course", EN: "Treadmills" }, keywords: ["tapis", "course", "run", "treadmill"] },
+    { id: "rameur", label: { FR: "Rameurs & Elliptiques", EN: "Rowers & Ellipticals" }, keywords: ["rameur", "elliptique", "rower"] },
+    { id: "muscu", label: { FR: "Musculation & Poids", EN: "Strength & Weights" }, keywords: ["poids", "musculation", "haltère", "barre", "disque", "banc", "domyos"] },
+    { id: "accessoires", label: { FR: "Accessoires & Yoga", EN: "Accessories & Yoga" }, keywords: ["tapis sol", "élastique", "ballon", "corde", "yoga", "pilates", "rouleau"] }
+  ],
+  "exploration-sauvage": [
+    { id: "sac", label: { FR: "Sacs à Dos", EN: "Backpacks" }, keywords: ["sac", "backpack"] },
+    { id: "tech", label: { FR: "Montres & GPS", EN: "Watches & GPS" }, keywords: ["montre", "gps", "coros", "boussole"] },
+    { id: "chaussures", label: { FR: "Chaussures & Chaussettes", EN: "Footwear & Socks" }, keywords: ["chaussure", "botte", "chaussette", "shoes"] },
+    { id: "vetements", label: { FR: "Vêtements & Vestes", EN: "Apparel & Jackets" }, keywords: ["veste", "polaire", "pantalon", "t-shirt", "chemise", "gant", "bonnet"] },
+    { id: "bivouac", label: { FR: "Matériel de Bivouac", EN: "Camping & Hiking Gear" }, keywords: ["gourde", "bâton", "tente", "couchage", "matelas", "bouteille"] }
+  ]
+};
 
 export default function App() {
   const [currentLang, setCurrentLang] = useState<string>("FR");
@@ -126,6 +169,7 @@ export default function App() {
       console.error(e);
     }
   }, [favorites]);
+
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [comparedProducts, setComparedProducts] = useState<Product[]>([]);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
@@ -136,9 +180,11 @@ export default function App() {
   const [chatbotOpenTrigger, setChatbotOpenTrigger] = useState(false);
   const [chatbotInitialPrompt] = useState("");
   const [activeOverlay, setActiveOverlay] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   
   // Navigation sport, page slicing limits, and search inputs
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [catalogSearchQuery, setCatalogSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<string>("default");
@@ -147,16 +193,59 @@ export default function App() {
 
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.FR;
 
+  // Localize all products based on active language
+  const localizedProducts = useMemo(() => {
+    return translateProductsList(PRODUCTS, currentLang);
+  }, [currentLang]);
+
+  // Lock body scroll when modals/drawers are open
+  useEffect(() => {
+    const isAnyModalOpen =
+      !!selectedProduct ||
+      cartOpen ||
+      fullCartOpen ||
+      isCompareModalOpen ||
+      !!selectedServiceDetail ||
+      isAccountOpen;
+
+    if (isAnyModalOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+    
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [selectedProduct, cartOpen, fullCartOpen, isCompareModalOpen, selectedServiceDetail, isAccountOpen]);
+
   const isPLPActive = useMemo(() => !!catalogSearchQuery.trim() || selectedSport !== null, [catalogSearchQuery, selectedSport]);
 
   // Base products matching Sport and Search (the criteria other than current price range)
   const baseProductsForSliders = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return localizedProducts.filter((p) => {
       const matchesSport = selectedSport ? p.category === selectedSport : true;
       const matchesSearch = catalogSearchQuery ? matchesProductWithTypos(p, catalogSearchQuery) : true;
-      return matchesSport && matchesSearch;
+      
+      let matchesSubCategory = true;
+      if (selectedSport && selectedSubCategory) {
+        const subCats = SUB_CATEGORIES[selectedSport] || [];
+        const activeSub = subCats.find((s) => s.id === selectedSubCategory);
+        if (activeSub) {
+          const titleLower = p.name.toLowerCase();
+          const descLower = p.description ? p.description.toLowerCase() : "";
+          const specLower = p.details ? p.details.join(" ").toLowerCase() : "";
+          const fullText = `${titleLower} ${descLower} ${specLower}`;
+          matchesSubCategory = activeSub.keywords.some((kw) => fullText.includes(kw));
+        }
+      }
+
+      return matchesSport && matchesSearch && matchesSubCategory;
     });
-  }, [selectedSport, catalogSearchQuery]);
+  }, [localizedProducts, selectedSport, selectedSubCategory, catalogSearchQuery]);
 
   const basePrices = useMemo(() => baseProductsForSliders.map(p => p.price), [baseProductsForSliders]);
   const absoluteMinPrice = useMemo(() => basePrices.length > 0 ? Math.min(...basePrices) : 0, [basePrices]);
@@ -167,16 +256,29 @@ export default function App() {
 
   // Compute products list according to sport, search selections, and noble prices
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return localizedProducts.filter((p) => {
       const matchesSport = selectedSport ? p.category === selectedSport : true;
       const matchesSearch = catalogSearchQuery ? matchesProductWithTypos(p, catalogSearchQuery) : true;
       
+      let matchesSubCategory = true;
+      if (selectedSport && selectedSubCategory) {
+        const subCats = SUB_CATEGORIES[selectedSport] || [];
+        const activeSub = subCats.find((s) => s.id === selectedSubCategory);
+        if (activeSub) {
+          const titleLower = p.name.toLowerCase();
+          const descLower = p.description ? p.description.toLowerCase() : "";
+          const specLower = p.details ? p.details.join(" ").toLowerCase() : "";
+          const fullText = `${titleLower} ${descLower} ${specLower}`;
+          matchesSubCategory = activeSub.keywords.some((kw) => fullText.includes(kw));
+        }
+      }
+
       // Custom price range filtering
       const matchesPrice = p.price >= currentMinPrice && p.price <= currentMaxPrice;
 
-      return matchesSport && matchesSearch && matchesPrice;
+      return matchesSport && matchesSearch && matchesSubCategory && matchesPrice;
     });
-  }, [selectedSport, catalogSearchQuery, currentMinPrice, currentMaxPrice]);
+  }, [localizedProducts, selectedSport, selectedSubCategory, catalogSearchQuery, currentMinPrice, currentMaxPrice]);
 
   // Sort products based on criteria
   const sortedProducts = useMemo(() => {
@@ -297,7 +399,11 @@ export default function App() {
       if (exists) {
         return prev.filter((item) => item.id !== product.id);
       } else {
-        const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+        const width = typeof window !== "undefined" ? window.innerWidth || 375 : 375;
+        const isMobile = width < 768;
+        const isTablet = width >= 768 && width < 1200;
+        const limitCount = isMobile ? 2 : isTablet ? 3 : 4;
+
         if (prev.length > 0) {
           const firstProduct = prev[0];
           if (firstProduct.category !== product.category) {
@@ -310,16 +416,19 @@ export default function App() {
             return prev;
           }
         }
-        const limitCount = isMobile ? 2 : 4;
         if (prev.length >= limitCount) {
           setCompareWarning(
             currentLang === "FR"
               ? isMobile
                 ? "Sur mobile, vous pouvez comparer jusqu'à 2 créations."
-                : "Vous pouvez comparer jusqu'à 4 créations à la fois."
+                : isTablet
+                  ? "Sur tablette, vous pouvez comparer jusqu'à 3 créations."
+                  : "Vous pouvez comparer jusqu'à 4 créations à la fois."
               : isMobile
                 ? "On mobile, you can compare up to 2 creations."
-                : "You can compare up to 4 creations at a time."
+                : isTablet
+                  ? "On tablet, you can compare up to 3 creations."
+                  : "You can compare up to 4 creations at a time."
           );
           setTimeout(() => setCompareWarning(null), 4500);
           return prev;
@@ -331,6 +440,7 @@ export default function App() {
 
   const handleSportSelect = useCallback((sport: string | null) => {
     setSelectedSport(sport);
+    setSelectedSubCategory(null);
     setShowAllProducts(false); // Reset to compressed view when changing sports filter
     setTimeout(() => {
       handleScrollToSection(productsGridRef);
@@ -358,6 +468,7 @@ export default function App() {
         favorites={favorites}
         onViewProduct={(p) => setSelectedProduct(p)}
         onToggleFavorite={handleToggleFavorite}
+        onOpenAccount={() => setIsAccountOpen(true)}
         onLogoClick={() => {
           setCatalogSearchQuery("");
           setSelectedSport(null);
@@ -402,7 +513,7 @@ export default function App() {
 
               {/* Grid showcasing exactly the first 6 products in high-contrast 3-columns */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {PRODUCTS.slice(0, 6).map((p) => (
+                {localizedProducts.slice(0, 6).map((p) => (
                   <ProductCard
                     key={p.id}
                     product={p}
@@ -508,7 +619,7 @@ export default function App() {
                             ))}
                           </div>
                           <p className="text-xs sm:text-sm text-neutral-700 font-sans font-bold">
-                            {comparedProducts.length} / {typeof window !== "undefined" && window.innerWidth < 768 ? 2 : 4} {currentLang === "FR" ? "produit(s) sélectionné(s)" : "product(s) selected"}
+                            {comparedProducts.length} / {typeof window !== "undefined" ? (window.innerWidth < 768 ? 2 : window.innerWidth < 1200 ? 3 : 4) : 4} {currentLang === "FR" ? "produit(s) sélectionné(s)" : "product(s) selected"}
                           </p>
                         </>
                       )}
@@ -532,40 +643,88 @@ export default function App() {
                   <div className="space-y-4">
                     <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#A37E2C] flex items-center justify-between">
                       <span>{currentLang === "FR" ? "DISCIPLINES" : "SPECIALTIES"}</span>
-                      {selectedSport && (
+                      {(selectedSport || selectedSubCategory) && (
                         <button 
-                          onClick={() => setSelectedSport(null)}
+                          onClick={() => {
+                            setSelectedSport(null);
+                            setSelectedSubCategory(null);
+                          }}
                           className="text-xs lowercase font-normal underline hover:text-[#2E2218] text-[#A37E2C]"
                         >
-                          {currentLang === "FR" ? "effacer" : "clear"}
+                          {currentLang === "FR" ? "effacer tout" : "clear all"}
                         </button>
                       )}
                     </h4>
                     <div className="flex flex-col gap-3">
                       {[
-                        { id: null, label: currentLang === "FR" ? "Toutes les créations" : "All Specialties", icon: "⭐", count: PRODUCTS.length },
-                        { id: "aerodynamisme", label: currentLang === "FR" ? "Vélo" : "Bike & Cycling", icon: "🚴", count: PRODUCTS.filter(p => p.category === "aerodynamisme").length },
-                        { id: "resistance-active", label: currentLang === "FR" ? "Fitness" : "Fitness & Training", icon: "🏃", count: PRODUCTS.filter(p => p.category === "resistance-active").length },
-                        { id: "exploration-sauvage", label: currentLang === "FR" ? "Randonnée" : "Hiking & Outdoor", icon: "⛰️", count: PRODUCTS.filter(p => p.category === "exploration-sauvage").length }
-                      ].map((item) => (
-                        <button
-                          key={item.id === null ? "all" : item.id}
-                          onClick={() => setSelectedSport(item.id)}
-                          className={`flex items-center justify-between py-3.5 px-4 rounded-md text-sm transition-all duration-200 cursor-pointer ${
-                            selectedSport === item.id 
-                              ? "bg-[#2E2218] text-[#FAF9F4] font-bold shadow-md scale-[1.01]"
-                              : "text-neutral-700 bg-white/50 border border-neutral-200/50 hover:bg-neutral-200/60 hover:text-[#131211]"
-                          }`}
-                        >
-                          <span className="flex items-center gap-3">
-                            <span className="text-base">{item.icon}</span>
-                            <span className="tracking-wide">{item.label}</span>
-                          </span>
-                          <span className={`text-xs font-mono font-semibold ${selectedSport === item.id ? "text-[#A37E2C]" : "text-neutral-400"}`}>
-                            ({item.count})
-                          </span>
-                        </button>
-                      ))}
+                        { id: null, label: currentLang === "FR" ? "Toutes les créations" : "All Specialties", count: localizedProducts.length },
+                        { id: "aerodynamisme", label: currentLang === "FR" ? "Vélo" : "Bike & Cycling", count: localizedProducts.filter(p => p.category === "aerodynamisme").length },
+                        { id: "resistance-active", label: currentLang === "FR" ? "Fitness" : "Fitness & Training", count: localizedProducts.filter(p => p.category === "resistance-active").length },
+                        { id: "exploration-sauvage", label: currentLang === "FR" ? "Randonnée" : "Hiking & Outdoor", count: localizedProducts.filter(p => p.category === "exploration-sauvage").length }
+                      ].map((item) => {
+                        const isSelected = selectedSport === item.id;
+                        const hasSubCats = item.id && SUB_CATEGORIES[item.id];
+                        return (
+                          <div key={item.id === null ? "all" : item.id} className="space-y-2">
+                            <button
+                              onClick={() => {
+                                if (item.id === null) {
+                                  setSelectedSport(null);
+                                  setSelectedSubCategory(null);
+                                } else {
+                                  handleSportSelect(item.id);
+                                }
+                              }}
+                              className={`w-full flex items-center justify-between py-3.5 px-4 rounded-md text-sm transition-all duration-200 cursor-pointer ${
+                                isSelected 
+                                  ? "bg-[#2E2218] text-[#FAF9F4] font-bold shadow-md scale-[1.01]"
+                                  : "text-neutral-700 bg-white/50 border border-neutral-200/50 hover:bg-neutral-200/60 hover:text-[#131211]"
+                              }`}
+                            >
+                              <span className="flex items-center gap-3">
+                                <span className="tracking-wide">{item.label}</span>
+                              </span>
+                              <span className={`text-xs font-mono font-semibold ${isSelected ? "text-[#A37E2C]" : "text-neutral-400"}`}>
+                                ({item.count})
+                              </span>
+                            </button>
+
+                            {/* Sub-filters list rendered gracefully under selected sport category */}
+                            {isSelected && hasSubCats && (
+                              <div className="pl-4 pr-1 py-1.5 flex flex-col gap-1.5 border-l-2 border-[#A37E2C]/30 bg-[#FAF9F4]/30 rounded-r-md">
+                                {SUB_CATEGORIES[item.id!].map((sub) => {
+                                  const isSubSelected = selectedSubCategory === sub.id;
+                                  const countSub = localizedProducts.filter(p => {
+                                    if (p.category !== item.id) return false;
+                                    const titleLower = p.name.toLowerCase();
+                                    const descLower = p.description ? p.description.toLowerCase() : "";
+                                    const specLower = p.details ? p.details.join(" ").toLowerCase() : "";
+                                    const fullText = `${titleLower} ${descLower} ${specLower}`;
+                                    return sub.keywords.some(kw => fullText.includes(kw));
+                                  }).length;
+
+                                  if (countSub === 0) return null;
+
+                                  return (
+                                    <button
+                                      key={sub.id}
+                                      onClick={() => setSelectedSubCategory(isSubSelected ? null : sub.id)}
+                                      className={`w-full text-left py-2 px-3 rounded-md text-xs font-sans transition-all flex items-center justify-between cursor-pointer ${
+                                        isSubSelected
+                                          ? "bg-[#FAF9F4] border border-[#A37E2C] text-[#2E2218] font-bold shadow-sm"
+                                          : "text-neutral-600 hover:bg-neutral-100 hover:text-[#131211]"
+                                      }`}
+                                    >
+                                      <span>{currentLang === "FR" ? sub.label.FR : sub.label.EN}</span>
+                                      <span className="text-[10px] font-mono opacity-60">({countSub})</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -609,9 +768,9 @@ export default function App() {
                     
                     {/* Price range summary */}
                     <div className="text-sm font-extrabold text-[#2E2218] flex items-center justify-between font-mono bg-white px-3 py-2 rounded border border-neutral-200/60 shadow-inner">
-                      <span>{Math.round(currentMinPrice)} €</span>
+                      <span>{formatRoundPrice(currentMinPrice, currentLang)}</span>
                       <span className="text-neutral-300 font-normal">—</span>
-                      <span>{Math.round(currentMaxPrice)} €</span>
+                      <span>{formatRoundPrice(currentMaxPrice, currentLang)}</span>
                     </div>
 
                     {/* Highly polished, responsive dual range slider with larger touch targets */}
@@ -659,8 +818,8 @@ export default function App() {
 
                     {/* Dynamic boundaries helpers */}
                     <div className="flex justify-between items-center text-xs text-[#A37E2C] font-mono mt-1 select-none">
-                      <span>Min: {Math.round(absoluteMinPrice)} €</span>
-                      <span>Max: {Math.round(absoluteMaxPrice)} €</span>
+                      <span>Min: {formatRoundPrice(absoluteMinPrice, currentLang)}</span>
+                      <span>Max: {formatRoundPrice(absoluteMaxPrice, currentLang)}</span>
                     </div>
                   </div>
 
@@ -699,13 +858,7 @@ export default function App() {
                         {currentLang === "FR" ? "Sélection actuelle :" : "Active criteria:"}
                       </span>
                       
-                      {/* Query Tag */}
-                      {catalogSearchQuery.trim() && (
-                        <span className="bg-[#2E2218] text-[#FAF9F4] px-2.5 py-1 rounded-sm font-semibold flex items-center gap-2">
-                          <span>« {catalogSearchQuery} »</span>
-                          <button onClick={() => setCatalogSearchQuery("")} className="hover:text-[#A37E2C] text-xs font-bold font-mono">×</button>
-                        </span>
-                      )}
+
 
                       {/* Sport Tag */}
                       {selectedSport && (
@@ -725,7 +878,7 @@ export default function App() {
                       {(userMinPrice !== null || userMaxPrice !== null) && (
                         <span className="bg-neutral-100 text-[#131211] border border-neutral-300/30 px-2.5 py-1 rounded-sm font-semibold flex items-center gap-2">
                           <span>
-                            {Math.round(currentMinPrice)} € — {Math.round(currentMaxPrice)} €
+                            {formatRoundPrice(currentMinPrice, currentLang)} — {formatRoundPrice(currentMaxPrice, currentLang)}
                           </span>
                           <button onClick={() => { setUserMinPrice(null); setUserMaxPrice(null); }} className="hover:text-[#A37E2C] text-xs font-bold font-mono">×</button>
                         </span>
@@ -1094,11 +1247,18 @@ export default function App() {
         currentLang={currentLang}
       />
 
+      {/* Account / Profile Space */}
+      <AccountModal
+        isOpen={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        currentLang={currentLang}
+      />
+
       {/* Artificial Intelligence Artisan Guide */}
       <Chatbot
         currentLang={currentLang}
         itemsInCart={cartCount}
-        featuredProducts={PRODUCTS}
+        featuredProducts={localizedProducts}
         onSelectProduct={(p) => setSelectedProduct(p)}
         openTrigger={chatbotOpenTrigger}
         onClearTrigger={() => setChatbotOpenTrigger(false)}
