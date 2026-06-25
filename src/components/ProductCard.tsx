@@ -130,16 +130,16 @@ const ProductCard = memo(function ProductCard({
         <div className="pt-2 border-t border-neutral-300/20 flex items-center justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-[#A37E2C] font-semibold">
-              {currentLang === "FR" ? "Prix" : "Price"}
+              {currentLang === "DE" || currentLang === "CH" ? "Preis" : currentLang === "FR" ? "Prix" : "Price"}
             </p>
-            <p className="text-base sm:text-lg font-serif font-black text-[#2E2218] tracking-tight whitespace-nowrap">
+            <p className="text-xl sm:text-lg font-serif font-black text-[#2E2218] tracking-tight whitespace-nowrap">
               {formatPrice(product.price, currentLang)}
             </p>
           </div>
           
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              {currentLang === "FR" ? "Découvrir →" : "Discover →"}
+              {currentLang === "DE" || currentLang === "CH" ? "Entdecken →" : currentLang === "FR" ? "Découvrir →" : "Discover →"}
             </span>
           </div>
         </div>

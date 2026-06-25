@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Scale, ShoppingBag, Eye, AlertCircle, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Sparkles, FileText, Cpu, Ruler } from "lucide-react";
 import { Product } from "../types";
-import { formatPrice } from "../utils/translator";
+import { formatPrice, formatSizeDisplay } from "../utils/translator";
 
 interface ProductComparisonDockProps {
   comparedProducts: Product[];
@@ -42,7 +42,13 @@ export function ProductComparisonDock({
         <button
           onClick={() => setIsCollapsed(false)}
           className="bg-[#A37E2C] hover:bg-[#8c6b24] text-[#FAF9F4] p-3 rounded-full shadow-2xl flex items-center gap-2 border border-white hover:scale-110 active:scale-95 transition-all cursor-pointer group"
-          title={currentLang === "FR" ? "Ouvrir le comparateur" : "Open Comparison"}
+          title={
+            currentLang === "FR" || currentLang === "CH"
+              ? "Ouvrir le comparateur"
+              : currentLang === "DE"
+              ? "Vergleich öffnen"
+              : "Open Comparison"
+          }
         >
           <ChevronLeft className="w-4 h-4 animate-pulse group-hover:translate-x-[-2px] transition-transform" />
           <Scale className="w-4 h-4" />
@@ -72,10 +78,19 @@ export function ProductComparisonDock({
             </div>
             <div>
               <p className="text-sm sm:text-base font-sans font-extrabold tracking-wider uppercase text-[#2E2218] leading-tight">
-                {currentLang === "FR" ? "Outil de Comparaison" : "Comparison Workspace"}
+                {currentLang === "FR" || currentLang === "CH"
+                  ? "Outil de Comparaison"
+                  : currentLang === "DE"
+                  ? "Vergleichs-Arbeitsplatz"
+                  : "Comparison Workspace"}
               </p>
               <p className="text-xs sm:text-sm text-[#A37E2C] font-mono font-bold mt-0.5">
-                {comparedProducts.length} / {maxLimit} {currentLang === "FR" ? "produits comparés" : "products compared"}
+                {comparedProducts.length} / {maxLimit}{" "}
+                {currentLang === "FR" || currentLang === "CH"
+                  ? "produits comparés"
+                  : currentLang === "DE"
+                  ? "Produkte verglichen"
+                  : "products compared"}
               </p>
             </div>
           </div>
@@ -109,7 +124,11 @@ export function ProductComparisonDock({
               onClick={onClearAll}
               className="text-sm text-neutral-600 hover:text-red-650 underline font-extrabold cursor-pointer px-2.5"
             >
-              {currentLang === "FR" ? "Effacer tout" : "Clear all"}
+              {currentLang === "FR" || currentLang === "CH"
+                ? "Effacer tout"
+                : currentLang === "DE"
+                ? "Alles löschen"
+                : "Clear all"}
             </button>
             <button
               onClick={onCompareNow}
@@ -120,12 +139,22 @@ export function ProductComparisonDock({
                   : "bg-neutral-200 text-neutral-450 border border-neutral-300 cursor-not-allowed"
               }`}
             >
-              {currentLang === "FR" ? `Comparer (${comparedProducts.length})` : `Compare (${comparedProducts.length})`}
+              {currentLang === "FR" || currentLang === "CH"
+                ? `Comparer (${comparedProducts.length})`
+                : currentLang === "DE"
+                ? `Vergleichen (${comparedProducts.length})`
+                : `Compare (${comparedProducts.length})`}
             </button>
             <button
               onClick={() => setIsCollapsed(true)}
               className="p-1.5 text-neutral-400 hover:text-[#A37E2C] hover:bg-neutral-100 rounded-full cursor-pointer transition-all"
-              title={currentLang === "FR" ? "Réduire" : "Collapse"}
+              title={
+                currentLang === "FR" || currentLang === "CH"
+                  ? "Réduire"
+                  : currentLang === "DE"
+                  ? "Minimieren"
+                  : "Collapse"
+              }
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -250,11 +279,51 @@ export function ProductComparisonModal({
   const maxR = 95;
 
   const radarLabels = [
-    { label: currentLang === "FR" ? "Performance" : "Performance", key: "performance" },
-    { label: currentLang === "FR" ? "Sensation" : "Sensation", key: "prestige" },
-    { label: currentLang === "FR" ? "Finitions" : "Craftsmanship", key: "craftsmanship" },
-    { label: currentLang === "FR" ? "Durabilité" : "Durability", key: "durability" },
-    { label: currentLang === "FR" ? "Confort" : "Comfort", key: "comfort" },
+    {
+      label:
+        currentLang === "DE"
+          ? "Leistung"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "Performance"
+          : "Performance",
+      key: "performance"
+    },
+    {
+      label:
+        currentLang === "DE"
+          ? "Gefühl"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "Sensation"
+          : "Sensation",
+      key: "prestige"
+    },
+    {
+      label:
+        currentLang === "DE"
+          ? "Verarbeitung"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "Finitions"
+          : "Craftsmanship",
+      key: "craftsmanship"
+    },
+    {
+      label:
+        currentLang === "DE"
+          ? "Haltbarkeit"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "Durabilité"
+          : "Durability",
+      key: "durability"
+    },
+    {
+      label:
+        currentLang === "DE"
+          ? "Komfort"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "Confort"
+          : "Comfort",
+      key: "comfort"
+    },
   ];
 
   const getCoordinates = (index: number, valPercent: number) => {
@@ -278,40 +347,118 @@ export function ProductComparisonModal({
     // Factor 1: Overall Score
     const otherScores = others.map(o => o.stats.score).join(currentLang === "FR" ? " vs " : " vs ");
     facts.push({
-      title: currentLang === "FR" ? "Meilleure balance d'Atelier" : "Superior Overall Balance",
-      subtitle: `${wStats.score} pts ${currentLang === "FR" ? "contre" : "vs"} ${otherScores} pts`
+      title:
+        currentLang === "DE"
+          ? "Beste Atelier-Gesamtbalance"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "Meilleure balance d'Atelier"
+          : "Superior Overall Balance",
+      subtitle: `${wStats.score} pts ${
+        currentLang === "DE"
+          ? "gegen"
+          : currentLang === "FR" || currentLang === "CH"
+          ? "contre"
+          : "vs"
+      } ${otherScores} pts`
     });
 
     // Factor 2: Compare specific key stats
-    const checkMore = (statName: "performance" | "comfort" | "durability" | "craftsmanship" | "prestige", frLabel: string, enLabel: string) => {
+    const statLabels: Record<string, Record<string, string>> = {
+      performance: {
+        FR: "Rendement de puissance",
+        CH: "Rendement de puissance",
+        DE: "Leistungsübertragung",
+        EN: "Power Transfer"
+      },
+      comfort: {
+        FR: "Niveau de confort",
+        CH: "Niveau de confort",
+        DE: "Komfortstufe",
+        EN: "Comfort Index"
+      },
+      durability: {
+        FR: "Résistance & Garantie",
+        CH: "Résistance & Garantie",
+        DE: "Haltbarkeit & Garantie",
+        EN: "Durability Assurance"
+      },
+      craftsmanship: {
+        FR: "Finition et assemblage",
+        CH: "Finition et assemblage",
+        DE: "Verarbeitung & Montage",
+        EN: "Craftsmanship Quality"
+      },
+      prestige: {
+        FR: "Indice de sensation",
+        CH: "Indice de sensation",
+        DE: "Gefühlsindex",
+        EN: "Sensation Factor"
+      }
+    };
+
+    const checkMore = (statName: "performance" | "comfort" | "durability" | "craftsmanship" | "prestige") => {
       const isBetter = others.every(o => wStats[statName] >= o.stats[statName]);
       if (isBetter) {
         const valStr = others.map(o => o.stats[statName]).join(" vs ");
+        const labels = statLabels[statName];
+        const activeLabel = labels[currentLang] || labels.EN;
+        
+        let titleStr = "";
+        if (currentLang === "FR" || currentLang === "CH") {
+          titleStr = `${activeLabel} supérieur`;
+        } else if (currentLang === "DE") {
+          titleStr = `Höhere ${activeLabel}`;
+        } else {
+          titleStr = `Higher ${activeLabel}`;
+        }
+
         facts.push({
-          title: currentLang === "FR" ? `${frLabel} supérieur` : `Higher ${enLabel}`,
+          title: titleStr,
           subtitle: `${wStats[statName]}% vs ${valStr}%`
         });
       }
     };
 
-    checkMore("performance", "Rendement de puissance", "Power Transfer");
-    checkMore("comfort", "Niveau de confort", "Comfort Index");
-    checkMore("durability", "Résistance & Garantie", "Durability Assurance");
-    checkMore("craftsmanship", "Finition et assemblage", "Craftsmanship Quality");
-    checkMore("prestige", "Indice de sensation", "Sensation Factor");
+    checkMore("performance");
+    checkMore("comfort");
+    checkMore("durability");
+    checkMore("craftsmanship");
+    checkMore("prestige");
 
     // Fallback if not absolute winner in specific stats: grab top stats
     if (facts.length < 4) {
       if (wStats.craftsmanship > 80) {
         facts.push({
-          title: currentLang === "FR" ? "Finition d'orfèvrerie" : "Exceptional Craftsmanship",
-          subtitle: `${wStats.craftsmanship}% ${currentLang === "FR" ? "d'excellence certifiée" : "certified perfection"}`
+          title:
+            currentLang === "DE"
+              ? "Meisterhafte Verarbeitung"
+              : currentLang === "FR" || currentLang === "CH"
+              ? "Finition d'orfèvrerie"
+              : "Exceptional Craftsmanship",
+          subtitle: `${wStats.craftsmanship}% ${
+            currentLang === "DE"
+              ? "zertifizierte Exzellenz"
+              : currentLang === "FR" || currentLang === "CH"
+              ? "d'excellence certifiée"
+              : "certified perfection"
+          }`
         });
       }
       if (wStats.performance > 80) {
         facts.push({
-          title: currentLang === "FR" ? "Rendement mécanique d'élite" : "Elite Performance",
-          subtitle: `${wStats.performance}% ${currentLang === "FR" ? "d'efficience testée" : "measured efficiency"}`
+          title:
+            currentLang === "DE"
+              ? "Elite-Leistung"
+              : currentLang === "FR" || currentLang === "CH"
+              ? "Rendement mécanique d'élite"
+              : "Elite Performance",
+          subtitle: `${wStats.performance}% ${
+            currentLang === "DE"
+              ? "geprüfte Effizienz"
+              : currentLang === "FR" || currentLang === "CH"
+              ? "d'efficience testée"
+              : "measured efficiency"
+          }`
         });
       }
     }
@@ -334,7 +481,11 @@ export function ProductComparisonModal({
             <Scale className="w-6 h-6 text-[#A37E2C]" />
             <div>
               <span className="font-sans font-extrabold tracking-wider text-base sm:text-xl uppercase text-[#2E2218] block leading-tight">
-                {currentLang === "FR" ? "COMPARAISON DE PRODUITS" : "PRODUCT COMPARISON"}
+                {currentLang === "FR" || currentLang === "CH"
+                  ? "COMPARAISON DE PRODUITS"
+                  : currentLang === "DE"
+                  ? "PRODUKTVERGLEICH"
+                  : "PRODUCT COMPARISON"}
               </span>
             </div>
           </div>
@@ -354,7 +505,9 @@ export function ProductComparisonModal({
             <div className="py-20 text-center space-y-4">
               <span className="text-5xl text-neutral-300 inline-block rotate-12">⚖️</span>
               <p className="text-sm text-neutral-850 font-bold max-w-sm mx-auto">
-                {currentLang === "FR"
+                {currentLang === "DE"
+                  ? "Bitte wählen Sie mindestens 2 Kreationen aus, um einen detaillierten Vergleich durchzuführen."
+                  : currentLang === "FR" || currentLang === "CH"
                   ? "Veuillez sélectionner au moins 2 créations pour effectuer une comparaison détaillée."
                   : "Please select at least 2 creations to perform a detailed comparison."}
               </p>
@@ -362,7 +515,11 @@ export function ProductComparisonModal({
                 onClick={onClose}
                 className="px-5 py-2.5 bg-[#A37E2C] text-white text-xs font-serif uppercase tracking-widest font-black rounded hover:bg-[#8c6b24]"
               >
-                {currentLang === "FR" ? "Retourner au catalogue" : "Back to Catalog"}
+                {currentLang === "DE"
+                  ? "Zurück zum Katalog"
+                  : currentLang === "FR" || currentLang === "CH"
+                  ? "Retourner au catalogue"
+                  : "Back to Catalog"}
               </button>
             </div>
           ) : (
@@ -376,14 +533,18 @@ export function ProductComparisonModal({
                   <div className="flex items-center gap-2.5">
                     <Scale className="w-5 h-5 text-[#A37E2C]" />
                     <span className="font-sans font-extrabold text-sm sm:text-base text-[#2E2218] uppercase tracking-wider">
-                      {currentLang === "FR" ? "1. Galerie et tarifs des créations" : "1. Creations Gallery & Pricing"}
+                      {currentLang === "DE"
+                        ? "1. Galerie und Preise der Kreationen"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "1. Galerie et tarifs des créations"
+                        : "1. Creations Gallery & Pricing"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#A37E2C] font-sans font-bold hover:underline">
                     <span>
                       {isProductsSectionCollapsed 
-                        ? (currentLang === "FR" ? "Ouvrir" : "Expand") 
-                        : (currentLang === "FR" ? "Réduire" : "Collapse")}
+                        ? (currentLang === "DE" ? "Öffnen" : currentLang === "FR" || currentLang === "CH" ? "Ouvrir" : "Expand") 
+                        : (currentLang === "DE" ? "Minimieren" : currentLang === "FR" || currentLang === "CH" ? "Réduire" : "Collapse")}
                     </span>
                     {isProductsSectionCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </div>
@@ -430,7 +591,16 @@ export function ProductComparisonModal({
                                   {stats.score}
                                 </span>
                                 {isWinner && (
-                                  <div className="absolute -top-3.5 -right-2 text-lg xs:text-2xl sm:text-3xl animate-bounce" title={currentLang === "FR" ? "Gagnant" : "Winner"}>
+                                  <div
+                                    className="absolute -top-3.5 -right-2 text-lg xs:text-2xl sm:text-3xl animate-bounce"
+                                    title={
+                                      currentLang === "DE"
+                                        ? "Sieger"
+                                        : currentLang === "FR" || currentLang === "CH"
+                                        ? "Gagnant"
+                                        : "Winner"
+                                    }
+                                  >
                                     🏆
                                   </div>
                                 )}
@@ -442,7 +612,11 @@ export function ProductComparisonModal({
                                 </span>
                                 {isWinner && (
                                   <span className="text-[7px] xs:text-[8px] sm:text-[9px] uppercase tracking-wider text-amber-600 font-mono font-black block">
-                                    {currentLang === "FR" ? "★ GAGNANT" : "★ WINNER"}
+                                    {currentLang === "DE"
+                                      ? "★ SIEGER"
+                                      : currentLang === "FR" || currentLang === "CH"
+                                      ? "★ GAGNANT"
+                                      : "★ WINNER"}
                                   </span>
                                 )}
                               </div>
@@ -454,7 +628,13 @@ export function ProductComparisonModal({
                               <button
                                 onClick={() => onRemove(p)}
                                 className="absolute top-1 right-1 sm:top-2 sm:right-2 p-1 bg-white/90 hover:bg-red-500 hover:text-white rounded-full text-neutral-400 border border-neutral-200 shadow-sm z-10 transition-all cursor-pointer"
-                                title={currentLang === "FR" ? "Retirer" : "Remove"}
+                                title={
+                                  currentLang === "DE"
+                                    ? "Entfernen"
+                                    : currentLang === "FR" || currentLang === "CH"
+                                    ? "Retirer"
+                                    : "Remove"
+                                }
                               >
                                 <X className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
                               </button>
@@ -469,7 +649,13 @@ export function ProductComparisonModal({
                               {isWinner && (
                                 <div className="absolute -bottom-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white font-mono font-black text-[9px] xs:text-xs sm:text-sm uppercase tracking-widest px-3 py-1 rounded-full shadow-lg border-2 border-white flex items-center gap-1 z-10 animate-pulse">
                                   <span className="text-xs xs:text-sm sm:text-base">🏆</span>
-                                  <span className="text-[7px] xs:text-[10px] sm:text-xs">{currentLang === "FR" ? "GAGNANT" : "WINNER"}</span>
+                                  <span className="text-[7px] xs:text-[10px] sm:text-xs">
+                                    {currentLang === "DE"
+                                      ? "SIEGER"
+                                      : currentLang === "FR" || currentLang === "CH"
+                                      ? "GAGNANT"
+                                      : "WINNER"}
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -508,14 +694,18 @@ export function ProductComparisonModal({
                   <div className="flex items-center gap-2.5">
                     <Scale className="w-5 h-5 text-[#A37E2C]" />
                     <span className="font-sans font-extrabold text-sm sm:text-base text-[#2E2218] uppercase tracking-wider">
-                      {currentLang === "FR" ? "2. Analyse multidimensionnelle d'Atelier" : "2. Workshop Dimensional Analysis"}
+                      {currentLang === "DE"
+                        ? "2. Multidimensionale Atelier-Analyse"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "2. Analyse multidimensionnelle d'Atelier"
+                        : "2. Workshop Dimensional Analysis"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#A37E2C] font-sans font-bold hover:underline">
                     <span>
                       {isAnalysisCollapsed 
-                        ? (currentLang === "FR" ? "Ouvrir" : "Expand") 
-                        : (currentLang === "FR" ? "Réduire" : "Collapse")}
+                        ? (currentLang === "DE" ? "Öffnen" : currentLang === "FR" || currentLang === "CH" ? "Ouvrir" : "Expand") 
+                        : (currentLang === "DE" ? "Minimieren" : currentLang === "FR" || currentLang === "CH" ? "Réduire" : "Collapse")}
                     </span>
                     {isAnalysisCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </div>
@@ -527,7 +717,11 @@ export function ProductComparisonModal({
                     {/* Visual Radar spider chart board (lg:col-span-5) */}
                     <div className="lg:col-span-5 bg-stone-50/50 border border-neutral-200/60 rounded-xl p-5 flex flex-col items-center justify-center shadow-inner">
                       <h3 className="text-[10px] font-serif font-extrabold uppercase tracking-widest text-[#2E2218] mb-4 text-center">
-                        {currentLang === "FR" ? "EMPREINTE GÉOMÉTRIQUE" : "DIMENSIONAL PROFILE"}
+                        {currentLang === "DE"
+                          ? "GEOMETRISCHES PROFIL"
+                          : currentLang === "FR" || currentLang === "CH"
+                          ? "EMPREINTE GÉOMÉTRIQUE"
+                          : "DIMENSIONAL PROFILE"}
                       </h3>
 
                       {/* Custom SVG Radar spider chart */}
@@ -682,10 +876,16 @@ export function ProductComparisonModal({
 
                       <div className="bg-neutral-50/80 border border-neutral-350 rounded-lg p-3.5 mt-5">
                         <p className="text-[11px] font-mono text-neutral-850 uppercase font-black tracking-wider mb-1">
-                          {currentLang === "FR" ? "Évaluation Synthétique" : "Atelier Verdict"}
+                          {currentLang === "DE"
+                            ? "Atelier-Verdikt"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Évaluation Synthétique"
+                            : "Atelier Verdict"}
                         </p>
                         <p className="text-xs text-[#131211] leading-relaxed font-bold">
-                          {currentLang === "FR"
+                          {currentLang === "DE"
+                            ? `Die Kreuzanalyse von Atlis bestätigt die Überlegenheit der Kreation « ${winner?.product.name} » mit einer harmonischen Bewertung von ${winner?.stats.score} Punkten. Zertifizierte Höchstleistung für Ihre sportlichen Herausforderungen.`
+                            : currentLang === "FR" || currentLang === "CH"
                             ? `L'analyse croisée d'Atlis confirme la supériorité de la création « ${winner?.product.name} » avec un score harmonique de ${winner?.stats.score} points. Confection de haute voltige certifiée pour vos défis athlétiques.`
                             : `Cross-analysis from Atlis affirms the dominance of « ${winner?.product.name} » with a harmonized rating of ${winner?.stats.score} points, achieving unparalleled distinction.`}
                         </p>
@@ -705,14 +905,18 @@ export function ProductComparisonModal({
                   <div className="flex items-center gap-2.5">
                     <Scale className="w-5 h-5 text-[#A37E2C]" />
                     <span className="font-sans font-extrabold text-sm sm:text-base text-[#2E2218] uppercase tracking-wider">
-                      {currentLang === "FR" ? "3. Spécifications techniques d'Atelier" : "3. Technical Specifications"}
+                      {currentLang === "DE"
+                        ? "3. Technische Spezifikationen des Ateliers"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "3. Spécifications techniques d'Atelier"
+                        : "3. Technical Specifications"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#A37E2C] font-sans font-bold hover:underline">
                     <span>
                       {isSpecTableCollapsed 
-                        ? (currentLang === "FR" ? "Ouvrir" : "Expand") 
-                        : (currentLang === "FR" ? "Réduire" : "Collapse")}
+                        ? (currentLang === "DE" ? "Öffnen" : currentLang === "FR" || currentLang === "CH" ? "Ouvrir" : "Expand") 
+                        : (currentLang === "DE" ? "Minimieren" : currentLang === "FR" || currentLang === "CH" ? "Réduire" : "Collapse")}
                     </span>
                     {isSpecTableCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                   </div>
@@ -733,7 +937,11 @@ export function ProductComparisonModal({
                     {isDesktop && (
                       <div className="border-b-2 border-neutral-200/45 bg-neutral-100/30 p-2 sm:p-4 flex items-center justify-center">
                         <span className="text-xs font-mono font-black text-neutral-450 uppercase tracking-wider">
-                          {currentLang === "FR" ? "Créations" : "Creations"}
+                          {currentLang === "DE"
+                            ? "Kreationen"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Créations"
+                            : "Creations"}
                         </span>
                       </div>
                     )}
@@ -756,7 +964,13 @@ export function ProductComparisonModal({
                     >
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-[#A37E2C]" />
-                        <span>{currentLang === "FR" ? "Points forts d'Atelier" : "Workshop Key Highlights"}</span>
+                        <span>
+                          {currentLang === "DE"
+                            ? "Atelier-Highlights"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Points forts d'Atelier"
+                            : "Workshop Key Highlights"}
+                        </span>
                       </div>
                       {isAtoutCleCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
@@ -774,27 +988,52 @@ export function ProductComparisonModal({
                       let badge = { text: "", styles: "" };
                       if (isBestBudget) {
                         badge = {
-                           text: currentLang === "FR" ? "🪙 Budget Idéal" : "🪙 Best Price",
+                           text:
+                             currentLang === "DE"
+                               ? "🪙 Ideales Budget"
+                               : currentLang === "FR" || currentLang === "CH"
+                               ? "🪙 Budget Idéal"
+                               : "🪙 Best Price",
                            styles: "bg-emerald-55 text-emerald-900 border-emerald-350 hover:scale-105 font-bold"
                         };
                       } else if (isBestRating) {
                         badge = {
-                           text: currentLang === "FR" ? "⭐ Évalué" : "⭐ Rated",
+                           text:
+                             currentLang === "DE"
+                               ? "⭐ Bewertet"
+                               : currentLang === "FR" || currentLang === "CH"
+                               ? "⭐ Évalué"
+                               : "⭐ Rated",
                            styles: "bg-amber-55 text-amber-900 border-amber-350 hover:scale-105 font-bold"
                         };
                       } else if (isMostPopular) {
                         badge = {
-                           text: currentLang === "FR" ? "🔥 Favori" : "🔥 Popular",
+                           text:
+                             currentLang === "DE"
+                               ? "🔥 Favorit"
+                               : currentLang === "FR" || currentLang === "CH"
+                               ? "🔥 Favori"
+                               : "🔥 Popular",
                            styles: "bg-blue-55 text-blue-900 border-blue-350 hover:scale-105 font-bold"
                         };
                       } else if (isPremiumChoice) {
                         badge = {
-                           text: currentLang === "FR" ? "🏎️ Premium" : "🏎️ Premium",
+                           text:
+                             currentLang === "DE"
+                               ? "🏎️ Premium"
+                               : currentLang === "FR" || currentLang === "CH"
+                               ? "🏎️ Premium"
+                               : "🏎️ Premium",
                            styles: "bg-purple-55 text-purple-900 border-purple-350 hover:scale-105 font-bold"
                         };
                       } else {
                         badge = {
-                           text: currentLang === "FR" ? "✨ Excellence" : "✨ Pure Perf",
+                           text:
+                             currentLang === "DE"
+                               ? "✨ Exzellenz"
+                               : currentLang === "FR" || currentLang === "CH"
+                               ? "✨ Excellence"
+                               : "✨ Pure Perf",
                            styles: "bg-stone-100 text-[#131211] border-stone-300 hover:scale-105 font-bold"
                         };
                       }
@@ -825,7 +1064,13 @@ export function ProductComparisonModal({
                     >
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-[#A37E2C]" />
-                        <span>{currentLang === "FR" ? "Description d'Atelier" : "Workshop Description"}</span>
+                        <span>
+                          {currentLang === "DE"
+                            ? "Atelier-Beschreibung"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Description d'Atelier"
+                            : "Workshop Description"}
+                        </span>
                       </div>
                       {isDescriptionCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
@@ -843,7 +1088,9 @@ export function ProductComparisonModal({
                             : "p-2.5 sm:p-6 text-[10px] xs:text-sm sm:text-base text-neutral-800 font-bold leading-relaxed"
                         }`}
                       >
-                        {!isDescriptionCollapsed && p.description}
+                        {!isDescriptionCollapsed && (
+                          <p className="line-clamp-6">{p.description}</p>
+                        )}
                       </div>
                     ))}
 
@@ -855,7 +1102,13 @@ export function ProductComparisonModal({
                     >
                       <div className="flex items-center gap-2">
                         <Cpu className="w-4 h-4 text-[#A37E2C]" />
-                        <span>{currentLang === "FR" ? "Atouts Techniques" : "Technical Highlights"}</span>
+                        <span>
+                          {currentLang === "DE"
+                            ? "Technische Highlights"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Atouts Techniques"
+                            : "Technical Highlights"}
+                        </span>
                       </div>
                       {isTechnicalCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
@@ -876,7 +1129,11 @@ export function ProductComparisonModal({
                         {!isTechnicalCollapsed && (
                           p.details.length === 0 ? (
                             <span className="text-[10px] xs:text-sm sm:text-base text-stone-550 font-bold italic">
-                              {currentLang === "FR" ? "Confection premium sur-mesure" : "Premium tailored manufacturing"}
+                              {currentLang === "DE"
+                                ? "Premium-Maßanfertigung"
+                                : currentLang === "FR" || currentLang === "CH"
+                                ? "Confection premium sur-mesure"
+                                : "Premium tailored manufacturing"}
                             </span>
                           ) : (
                             <ul className="space-y-1 sm:space-y-2 list-disc pl-3 sm:pl-6 font-bold text-neutral-805">
@@ -897,7 +1154,13 @@ export function ProductComparisonModal({
                     >
                       <div className="flex items-center gap-2">
                         <Ruler className="w-4 h-4 text-[#A37E2C]" />
-                        <span>{currentLang === "FR" ? "Tailles" : "Sizes"}</span>
+                        <span>
+                          {currentLang === "DE"
+                            ? "Größen"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Tailles"
+                            : "Sizes"}
+                        </span>
                       </div>
                       {isSizesCollapsed ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" /> : <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#A37E2C]" />}
                     </button>
@@ -909,7 +1172,7 @@ export function ProductComparisonModal({
                     {comparedProducts.map((p) => (
                       <div 
                         key={p.id} 
-                        className={`border-b border-neutral-200/40 flex items-center justify-center ${
+                        className={`border-b-2 border-neutral-200/40 flex items-center justify-center ${
                           isSizesCollapsed 
                             ? "h-0 py-0 overflow-hidden opacity-0 pointer-events-none border-b-transparent" 
                             : "p-1.5 sm:p-5 text-center"
@@ -917,7 +1180,7 @@ export function ProductComparisonModal({
                       >
                         {!isSizesCollapsed && (
                           <span className="text-[9px] xs:text-xs sm:text-sm font-mono font-extrabold text-neutral-900 bg-neutral-150 px-1.5 py-1 sm:px-4 sm:py-2 rounded-md border border-neutral-300 shadow-sm">
-                            {p.sizes && p.sizes.length > 0 ? p.sizes.join(", ") : "Standard"}
+                            {p.sizes && p.sizes.length > 0 ? p.sizes.map(s => formatSizeDisplay(s, currentLang)).join(", ") : "Standard"}
                           </span>
                         )}
                       </div>
@@ -933,7 +1196,11 @@ export function ProductComparisonModal({
                 <div className="flex items-center gap-2.5 mb-4 border-b border-neutral-100 pb-2">
                   <ShoppingBag className="w-5 h-5 text-[#A37E2C]" />
                   <span className="font-sans font-extrabold text-sm sm:text-base text-[#2E2218] uppercase tracking-wider">
-                    {currentLang === "FR" ? "4. Actions d'achat d'Atelier" : "4. Workshop Actions & Purchase"}
+                    {currentLang === "DE"
+                      ? "4. Atelier-Kaufaktionen"
+                      : currentLang === "FR" || currentLang === "CH"
+                      ? "4. Actions d'achat d'Atelier"
+                      : "4. Workshop Actions & Purchase"}
                   </span>
                 </div>
                 
@@ -973,7 +1240,13 @@ export function ProductComparisonModal({
                           className="w-full flex items-center justify-center gap-1.5 px-2 py-2 border-2 border-neutral-300 hover:border-[#A37E2C] text-neutral-700 hover:text-[#A37E2C] hover:bg-neutral-50 transition-all rounded bg-white cursor-pointer font-bold uppercase tracking-wider text-xs"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>{currentLang === "FR" ? "Détails" : "Details"}</span>
+                          <span>
+                            {currentLang === "DE"
+                              ? "Details"
+                              : currentLang === "FR" || currentLang === "CH"
+                              ? "Détails"
+                              : "Details"}
+                          </span>
                         </button>
 
                         <button
@@ -984,7 +1257,13 @@ export function ProductComparisonModal({
                           className="w-full flex items-center justify-center gap-1.5 px-2 py-2 text-xs bg-[#A37E2C] hover:bg-[#8c6b24] text-white transition-all rounded cursor-pointer font-serif uppercase tracking-wider font-extrabold shadow-sm"
                         >
                           <ShoppingBag className="w-3.5 h-3.5" />
-                          <span>{currentLang === "FR" ? "Acheter" : "Buy"}</span>
+                          <span>
+                            {currentLang === "DE"
+                              ? "Kaufen"
+                              : currentLang === "FR" || currentLang === "CH"
+                              ? "Acheter"
+                              : "Buy"}
+                          </span>
                         </button>
                       </div>
                     ))}
@@ -1000,13 +1279,22 @@ export function ProductComparisonModal({
         {comparedProducts.length >= 2 && (
           <div className="px-6 py-4 border-t border-neutral-200 bg-neutral-100/50 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-3">
             <span className="font-sans font-bold text-neutral-700">
-              {comparedProducts.length} {currentLang === "FR" ? "produits comparés" : "products compared"}
+              {comparedProducts.length}{" "}
+              {currentLang === "DE"
+                ? "Produkte verglichen"
+                : currentLang === "FR" || currentLang === "CH"
+                ? "produits comparés"
+                : "products compared"}
             </span>
             <button
               onClick={onClose}
               className="px-5 py-2 border-2 border-neutral-300 hover:border-black text-black font-medium transition-colors uppercase tracking-widest text-[10px] rounded cursor-pointer"
             >
-              {currentLang === "FR" ? "Fermer l'Atelier" : "Exit Atelier"}
+              {currentLang === "DE"
+                ? "Atelier schließen"
+                : currentLang === "FR" || currentLang === "CH"
+                ? "Fermer l'Atelier"
+                : "Exit Atelier"}
             </button>
           </div>
         )}

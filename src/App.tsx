@@ -11,10 +11,10 @@ import Chatbot from "./components/Chatbot";
 import AltisLogo from "./components/AltisLogo";
 import AccountModal from "./components/AccountModal";
 import { PRODUCTS } from "./data/products";
-import { translateProductsList } from "./utils/translator";
+import { translateProductsList, formatSizeDisplay } from "./utils/translator";
 import { TRANSLATIONS } from "./data/translations";
 import { Product, CartItem } from "./types";
-import { Sparkles, Award, Shield, Hammer, MapPin, Scale, X } from "lucide-react";
+import { Sparkles, Award, Shield, Hammer, MapPin, Scale, X, SlidersHorizontal, Check } from "lucide-react";
 
 // Format price helper according to chosen language and currency
 function formatRoundPrice(price: number, lang: string): string {
@@ -125,26 +125,26 @@ function matchesProductWithTypos(product: Product, query: string): boolean {
   return allWordsMatch;
 }
 
-const SUB_CATEGORIES: Record<string, Array<{ id: string; label: { FR: string; EN: string }; keywords: string[] }>> = {
+const SUB_CATEGORIES: Record<string, Array<{ id: string; label: { FR: string; EN: string; DE: string; CH: string }; keywords: string[] }>> = {
   aerodynamisme: [
-    { id: "electric", label: { FR: "Vélo Électrique", EN: "Electric Bike" }, keywords: ["electrique", "électrique", "assistance", "e-", "electric"] },
-    { id: "gravel", label: { FR: "Gravel", EN: "Gravel" }, keywords: ["gravel", "grvl"] },
-    { id: "route", label: { FR: "Vélo de Route", EN: "Road Bike" }, keywords: ["route", "rc", "course"] },
-    { id: "vtt", label: { FR: "VTT (Tout Terrain)", EN: "Mountain Bike" }, keywords: ["vtt", "terrain", "rockrider", "st "] },
-    { id: "ville", label: { FR: "Vélo de Ville & Pliant", EN: "City & Folding Bike" }, keywords: ["ville", "pliant", "elops", "tilt"] }
+    { id: "electric", label: { FR: "Vélo Électrique", EN: "Electric Bike", DE: "E-Bike & Elektro-Fahrrad", CH: "E-Bike & Elektro-Fahrrad" }, keywords: ["electrique", "électrique", "assistance", "e-", "electric"] },
+    { id: "gravel", label: { FR: "Gravel", EN: "Gravel", DE: "Gravel", CH: "Gravel" }, keywords: ["gravel", "grvl"] },
+    { id: "route", label: { FR: "Vélo de Route", EN: "Road Bike", DE: "Rennrad", CH: "Rennrad" }, keywords: ["route", "rc", "course"] },
+    { id: "vtt", label: { FR: "VTT (Tout Terrain)", EN: "Mountain Bike", DE: "Mountainbike (MTB)", CH: "Mountainbike (MTB)" }, keywords: ["vtt", "terrain", "rockrider", "st "] },
+    { id: "ville", label: { FR: "Vélo de Ville & Pliant", EN: "City & Folding Bike", DE: "City- & Klapprad", CH: "City- & Klapprad" }, keywords: ["ville", "pliant", "elops", "tilt"] }
   ],
   "resistance-active": [
-    { id: "tapis", label: { FR: "Tapis de Course", EN: "Treadmills" }, keywords: ["tapis", "course", "run", "treadmill"] },
-    { id: "rameur", label: { FR: "Rameurs & Elliptiques", EN: "Rowers & Ellipticals" }, keywords: ["rameur", "elliptique", "rower"] },
-    { id: "muscu", label: { FR: "Musculation & Poids", EN: "Strength & Weights" }, keywords: ["poids", "musculation", "haltère", "barre", "disque", "banc", "domyos"] },
-    { id: "accessoires", label: { FR: "Accessoires & Yoga", EN: "Accessories & Yoga" }, keywords: ["tapis sol", "élastique", "ballon", "corde", "yoga", "pilates", "rouleau"] }
+    { id: "tapis", label: { FR: "Tapis de Course", EN: "Treadmills", DE: "Laufbänder", CH: "Laufbänder" }, keywords: ["tapis", "course", "run", "treadmill"] },
+    { id: "rameur", label: { FR: "Rameurs & Elliptiques", EN: "Rowers & Ellipticals", DE: "Rudergeräte & Crosstrainer", CH: "Rudergeräte & Crosstrainer" }, keywords: ["rameur", "elliptique", "rower"] },
+    { id: "muscu", label: { FR: "Musculation & Poids", EN: "Strength & Weights", DE: "Krafttraining & Gewichte", CH: "Krafttraining & Gewichte" }, keywords: ["poids", "musculation", "haltère", "barre", "disque", "banc", "domyos"] },
+    { id: "accessoires", label: { FR: "Accessoires & Yoga", EN: "Accessories & Yoga", DE: "Zubehör & Yoga", CH: "Zubehör & Yoga" }, keywords: ["tapis sol", "élastique", "ballon", "corde", "yoga", "pilates", "rouleau"] }
   ],
   "exploration-sauvage": [
-    { id: "sac", label: { FR: "Sacs à Dos", EN: "Backpacks" }, keywords: ["sac", "backpack"] },
-    { id: "tech", label: { FR: "Montres & GPS", EN: "Watches & GPS" }, keywords: ["montre", "gps", "coros", "boussole"] },
-    { id: "chaussures", label: { FR: "Chaussures & Chaussettes", EN: "Footwear & Socks" }, keywords: ["chaussure", "botte", "chaussette", "shoes"] },
-    { id: "vetements", label: { FR: "Vêtements & Vestes", EN: "Apparel & Jackets" }, keywords: ["veste", "polaire", "pantalon", "t-shirt", "chemise", "gant", "bonnet"] },
-    { id: "bivouac", label: { FR: "Matériel de Bivouac", EN: "Camping & Hiking Gear" }, keywords: ["gourde", "bâton", "tente", "couchage", "matelas", "bouteille"] }
+    { id: "sac", label: { FR: "Sacs à Dos", EN: "Backpacks", DE: "Rucksäcke", CH: "Rucksäcke" }, keywords: ["sac", "backpack"] },
+    { id: "tech", label: { FR: "Montres & GPS", EN: "Watches & GPS", DE: "Uhren & GPS", CH: "Uhren & GPS" }, keywords: ["montre", "gps", "coros", "boussole"] },
+    { id: "chaussures", label: { FR: "Chaussures & Chaussettes", EN: "Footwear & Socks", DE: "Schuhe & Socken", CH: "Schuhe & Socken" }, keywords: ["chaussure", "botte", "chaussette", "shoes"] },
+    { id: "vetements", label: { FR: "Vêtements & Vestes", EN: "Apparel & Jackets", DE: "Bekleidung & Jacken", CH: "Bekleidung & Jacken" }, keywords: ["veste", "polaire", "pantalon", "t-shirt", "chemise", "gant", "bonnet"] },
+    { id: "bivouac", label: { FR: "Matériel de Bivouac", EN: "Camping & Hiking Gear", DE: "Camping- & Wanderausrüstung", CH: "Camping- & Wanderausrüstung" }, keywords: ["gourde", "bâton", "tente", "couchage", "matelas", "bouteille"] }
   ]
 };
 
@@ -190,6 +190,8 @@ export default function App() {
   const [sortBy, setSortBy] = useState<string>("default");
   const [userMinPrice, setUserMinPrice] = useState<number | null>(null);
   const [userMaxPrice, setUserMaxPrice] = useState<number | null>(null);
+  const [showFilters, setShowFilters] = useState(true);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.FR;
 
@@ -254,6 +256,90 @@ export default function App() {
   const currentMinPrice = useMemo(() => userMinPrice !== null ? Math.max(absoluteMinPrice, Math.min(userMinPrice, absoluteMaxPrice)) : absoluteMinPrice, [userMinPrice, absoluteMinPrice, absoluteMaxPrice]);
   const currentMaxPrice = useMemo(() => userMaxPrice !== null ? Math.min(absoluteMaxPrice, Math.max(userMaxPrice, absoluteMinPrice)) : absoluteMaxPrice, [userMaxPrice, absoluteMaxPrice, absoluteMinPrice]);
 
+  const sizesData = useMemo(() => {
+    const normalizeSize = (size: string): string => {
+      if (!size) return "";
+      const s = size.trim().toUpperCase().replace(/\.$/, "");
+      const noSizeTerms = [
+        "NO SIZE",
+        "SANS TAILLE",
+        "UNIQUE",
+        "TAILLE UNIQUE",
+        "ONE SIZE",
+        "TU",
+        "U"
+      ];
+      if (noSizeTerms.includes(s)) {
+        return "TAILLE UNIQUE";
+      }
+      return s;
+    };
+
+    const sizeCounts: { [key: string]: number } = {};
+    baseProductsForSliders.forEach((p) => {
+      if (p.sizes && Array.isArray(p.sizes)) {
+        const productNormalizedSizes = new Set<string>();
+        p.sizes.forEach((s) => {
+          if (s && s.trim()) {
+            const norm = normalizeSize(s);
+            if (norm) productNormalizedSizes.add(norm);
+          }
+        });
+        productNormalizedSizes.forEach((norm) => {
+          sizeCounts[norm] = (sizeCounts[norm] || 0) + 1;
+        });
+      }
+    });
+
+    const allUniqueSizes = Object.keys(sizeCounts);
+
+    // Custom comparator to sort sizes in ascending order (from smallest to largest)
+    const compareSizesAsc = (a: string, b: string) => {
+      const isNumA = !isNaN(Number(a));
+      const isNumB = !isNaN(Number(b));
+      
+      // If both are numeric, sort numerically (e.g., shoe/pant sizes 38, 40)
+      if (isNumA && isNumB) return Number(a) - Number(b);
+      // Place numeric sizes after alphabetical sizes
+      if (isNumA) return 1;
+      if (isNumB) return -1;
+
+      // For standard text-based sport sizes, sort XS, S, M, L, XL, XXL, etc.
+      const order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+      const idxA = order.indexOf(a);
+      const idxB = order.indexOf(b);
+      
+      if (idxA !== -1 && idxB !== -1) {
+        return idxA - idxB;
+      }
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      
+      return a.localeCompare(b);
+    };
+
+    // Find the 5 most popular sizes by counting their frequency in our products
+    const sortedByPopularity = [...allUniqueSizes].sort((a, b) => {
+      const countDiff = sizeCounts[b] - sizeCounts[a];
+      if (countDiff !== 0) return countDiff;
+      // Fallback to size order if popularity is equal
+      return compareSizesAsc(a, b);
+    });
+
+    const top5Popular = sortedByPopularity.slice(0, 5);
+    const remainingSizes = allUniqueSizes.filter((s) => !top5Popular.includes(s));
+
+    // Sort both groups in ascending order
+    const sortedTop5 = [...top5Popular].sort(compareSizesAsc);
+    const sortedRemaining = [...remainingSizes].sort(compareSizesAsc);
+
+    return {
+      popular: sortedTop5.map(size => ({ size, count: sizeCounts[size] })),
+      remaining: sortedRemaining.map(size => ({ size, count: sizeCounts[size] })),
+      hasSizes: allUniqueSizes.length > 0
+    };
+  }, [baseProductsForSliders]);
+
   // Compute products list according to sport, search selections, and noble prices
   const filteredProducts = useMemo(() => {
     return localizedProducts.filter((p) => {
@@ -276,9 +362,27 @@ export default function App() {
       // Custom price range filtering
       const matchesPrice = p.price >= currentMinPrice && p.price <= currentMaxPrice;
 
-      return matchesSport && matchesSearch && matchesSubCategory && matchesPrice;
+      // Custom size filtering
+      const matchesSize = selectedSize
+        ? (p.sizes && Array.isArray(p.sizes) && p.sizes.some(s => {
+            const normalizedPSize = s.trim().toUpperCase().replace(/\.$/, "");
+            const noSizeTerms = [
+              "NO SIZE",
+              "SANS TAILLE",
+              "UNIQUE",
+              "TAILLE UNIQUE",
+              "ONE SIZE",
+              "TU",
+              "U"
+            ];
+            const normPSize = noSizeTerms.includes(normalizedPSize) ? "TAILLE UNIQUE" : normalizedPSize;
+            return normPSize === selectedSize;
+          }))
+        : true;
+
+      return matchesSport && matchesSearch && matchesSubCategory && matchesPrice && matchesSize;
     });
-  }, [localizedProducts, selectedSport, selectedSubCategory, catalogSearchQuery, currentMinPrice, currentMaxPrice]);
+  }, [localizedProducts, selectedSport, selectedSubCategory, catalogSearchQuery, currentMinPrice, currentMaxPrice, selectedSize]);
 
   // Sort products based on criteria
   const sortedProducts = useMemo(() => {
@@ -404,32 +508,38 @@ export default function App() {
         const isTablet = width >= 768 && width < 1200;
         const limitCount = isMobile ? 2 : isTablet ? 3 : 4;
 
+        const isFrenchLike = currentLang === "FR" || currentLang === "CH";
+        const isGerman = currentLang === "DE";
+
         if (prev.length > 0) {
           const firstProduct = prev[0];
           if (firstProduct.category !== product.category) {
-            setCompareWarning(
-              currentLang === "FR"
-                ? "Comparez uniquement des créations de même sport."
-                : "Only compare items within the same sport category."
-            );
+            const mismatchWarning = isFrenchLike
+              ? "Comparez uniquement des créations de même sport."
+              : isGerman
+                ? "Vergleichen Sie nur Kreationen der gleichen Kategorie."
+                : "Only compare items within the same sport category.";
+            setCompareWarning(mismatchWarning);
             setTimeout(() => setCompareWarning(null), 4000);
             return prev;
           }
         }
         if (prev.length >= limitCount) {
-          setCompareWarning(
-            currentLang === "FR"
-              ? isMobile
-                ? "Sur mobile, vous pouvez comparer jusqu'à 2 créations."
-                : isTablet
-                  ? "Sur tablette, vous pouvez comparer jusqu'à 3 créations."
-                  : "Vous pouvez comparer jusqu'à 4 créations à la fois."
-              : isMobile
-                ? "On mobile, you can compare up to 2 creations."
-                : isTablet
-                  ? "On tablet, you can compare up to 3 creations."
-                  : "You can compare up to 4 creations at a time."
-          );
+          let limitWarning = "";
+          if (isFrenchLike) {
+            if (isMobile) limitWarning = "Sur mobile, vous pouvez comparer jusqu'à 2 créations.";
+            else if (isTablet) limitWarning = "Sur tablette, vous pouvez comparer jusqu'à 3 créations.";
+            else limitWarning = "Vous pouvez comparer jusqu'à 4 créations à la fois (Exclusif PC).";
+          } else if (isGerman) {
+            if (isMobile) limitWarning = "Auf Mobilgeräten können Sie bis zu 2 Kreationen vergleichen.";
+            else if (isTablet) limitWarning = "Auf Tablets können Sie bis zu 3 Kreationen vergleichen.";
+            else limitWarning = "Sie können bis zu 4 Kreationen gleichzeitig vergleichen (PC-Exklusiv).";
+          } else {
+            if (isMobile) limitWarning = "On mobile, you can compare up to 2 creations.";
+            else if (isTablet) limitWarning = "On tablet, you can compare up to 3 creations.";
+            else limitWarning = "You can compare up to 4 creations at a time (Desktop exclusive).";
+          }
+          setCompareWarning(limitWarning);
           setTimeout(() => setCompareWarning(null), 4500);
           return prev;
         }
@@ -438,9 +548,20 @@ export default function App() {
     });
   }, [currentLang]);
 
+  const handleAutoCompareFour = useCallback(() => {
+    const targetSport = selectedSport || "aerodynamisme";
+    const sportProducts = localizedProducts.filter(p => p.category === targetSport);
+    const selection = sportProducts.slice(0, 4);
+    if (selection.length >= 2) {
+      setComparedProducts(selection);
+      setIsCompareModalOpen(true);
+    }
+  }, [selectedSport, localizedProducts]);
+
   const handleSportSelect = useCallback((sport: string | null) => {
     setSelectedSport(sport);
     setSelectedSubCategory(null);
+    setSelectedSize(null); // Reset size filter when sport category changes
     setShowAllProducts(false); // Reset to compressed view when changing sports filter
     setTimeout(() => {
       handleScrollToSection(productsGridRef);
@@ -501,14 +622,14 @@ export default function App() {
             /* ================= HOMEPAGE VIEW: RESTORED 6 PREMIUM PRODUCTS ================= */
             <>
               {/* Premium Heritage Subheading Titles */}
-              <div className="text-center space-y-3 mb-12">
+              <div className="text-left sm:text-center space-y-3 mb-12">
                 <p className="text-xs uppercase tracking-[0.25em] text-[#A37E2C] font-bold">
                   {t.heritageSub}
                 </p>
                 <h2 className="text-3xl sm:text-4xl font-serif font-semibold text-[#131211]">
                   {t.heritageTitle}
                 </h2>
-                <div className="h-0.5 bg-[#A37E2C] w-16 mx-auto" />
+                <div className="h-0.5 bg-[#A37E2C] w-16 mr-auto sm:mx-auto" />
               </div>
 
               {/* Grid showcasing exactly the first 6 products in high-contrast 3-columns */}
@@ -533,7 +654,7 @@ export default function App() {
             /* ================= PLP VIEW: ACTIVE SEARCH / SPORT FILTERING ================= */
             <>
               {/* Custom PLP Header inspired by the high contrast, negative space editorial homepage */}
-              <div className="text-center space-y-4 mb-16 animate-fade-in">
+              <div className="text-left sm:text-center space-y-4 mb-16 animate-fade-in">
                 <div className="inline-flex items-center gap-2 border border-[#A37E2C]/30 bg-[#FAF9F4] px-4 py-1 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#A37E2C] animate-pulse" />
                   <span className="text-[9px] uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold font-mono">
@@ -556,14 +677,30 @@ export default function App() {
                     ? "Découvrez nos équipements de sport alliant innovation technique, confort optimal et look haut de gamme."
                     : "Discover our sport gear combining technical innovation, optimal comfort, and premium style."}
                 </p>
-                <div className="h-0.5 bg-[#A37E2C] w-12 mx-auto" />
+                <div className="h-0.5 bg-[#A37E2C] w-12 mr-auto sm:mx-auto" />
+              </div>
+
+              {/* Toggle Filters Button for Tablet & Desktop views */}
+              <div className="hidden md:flex items-center justify-between mb-8">
+                <button
+                  id="toggle-filters-btn"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="px-5 py-3 bg-white border-2 border-[#2E2218]/15 hover:border-[#A37E2C] text-[#2E2218] hover:text-[#A37E2C] text-xs font-black uppercase tracking-widest rounded transition-all cursor-pointer flex items-center gap-2 hover:bg-[#FAF9F4]"
+                >
+                  <SlidersHorizontal className="w-4 h-4 text-[#A37E2C]" />
+                  <span>
+                    {showFilters 
+                      ? (TRANSLATIONS[currentLang]?.hideFilters || TRANSLATIONS["EN"].hideFilters) 
+                      : (TRANSLATIONS[currentLang]?.showFilters || TRANSLATIONS["EN"].showFilters)}
+                  </span>
+                </button>
               </div>
 
               {/* TWO COLUMN PLP LAYOUT */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-12 text-left items-start">
                 
                 {/* LEFT COLUMN: Organized Luxury Filters Panel (Wider column layout for improved accessibility) */}
-                <div className="md:col-span-4 space-y-10 bg-[#FAF9F4] p-8 md:p-9 border border-neutral-300/30 rounded-md shadow-sm animate-fade-in self-start">
+                <div className={`${showFilters ? "md:col-span-4" : "hidden"} space-y-10 bg-[#FAF9F4] p-8 md:p-9 border border-neutral-300/30 rounded-md shadow-sm animate-fade-in self-start w-full`}>
                   
                   {/* Section 1: Active Stats & Header */}
                   <div className="border-b border-neutral-200 pb-6">
@@ -571,7 +708,12 @@ export default function App() {
                       {currentLang === "FR" ? "FILTRES DISPONIBLES" : "AVAILABLE FILTERS"}
                     </h3>
                     <p className="text-xs text-neutral-500 font-light">
-                      {filteredProducts.length} {currentLang === "FR" ? "produit(s) disponible(s)" : "product(s) available"}
+                      {filteredProducts.length}{" "}
+                      {currentLang === "DE"
+                        ? "Produkt(e) verfügbar"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "produit(s) disponible(s)"
+                        : "product(s) available"}
                     </p>
                   </div>
 
@@ -580,14 +722,20 @@ export default function App() {
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#A37E2C] flex items-center gap-1.5">
                         <Scale className="w-3.5 h-3.5" />
-                        <span>{currentLang === "FR" ? "COMPARAISON" : "PRODUCT COMPARISON"}</span>
+                        <span>
+                          {currentLang === "FR" || currentLang === "CH"
+                            ? "COMPARAISON"
+                            : currentLang === "DE"
+                            ? "VERGLEICH"
+                            : "PRODUCT COMPARISON"}
+                        </span>
                       </h4>
                       {comparedProducts.length > 0 && (
                         <button 
                           onClick={() => setComparedProducts([])}
                           className="text-xs lowercase font-normal underline hover:text-[#2E2218] text-[#A37E2C] cursor-pointer"
                         >
-                          {currentLang === "FR" ? "réinitialiser" : "reset"}
+                          {t.reset}
                         </button>
                       )}
                     </div>
@@ -595,8 +743,10 @@ export default function App() {
                     <div className="bg-white border-2 border-[#A37E2C]/20 rounded-md p-5 space-y-4 shadow-sm">
                       {comparedProducts.length === 0 ? (
                         <p className="text-sm xs:text-base text-neutral-800 font-bold leading-relaxed">
-                          {currentLang === "FR" 
+                          {currentLang === "FR" || currentLang === "CH"
                             ? "Aucun produit sélectionné. Cliquez sur l'icône de balance ⚖️ sur les produits pour comparer."
+                            : currentLang === "DE"
+                            ? "Keine Produkte ausgewählt. Klicken Sie auf das Waage-Symbol ⚖️ auf den Produkten, um sie zu vergleichen."
                             : "No products selected. Click the scale icon ⚖️ on products to compare them."}
                         </p>
                       ) : (
@@ -611,7 +761,13 @@ export default function App() {
                                     handleToggleCompare(p);
                                   }}
                                   className="absolute -top-1.5 -right-1.5 bg-red-55 hover:bg-red-650 text-white rounded-full p-1 shadow-sm cursor-pointer"
-                                  title={currentLang === "FR" ? "Retirer" : "Remove"}
+                                  title={
+                                    currentLang === "FR" || currentLang === "CH"
+                                      ? "Retirer"
+                                      : currentLang === "DE"
+                                      ? "Entfernen"
+                                      : "Remove"
+                                  }
                                 >
                                   <X className="w-2.5 h-2.5" />
                                 </button>
@@ -619,7 +775,12 @@ export default function App() {
                             ))}
                           </div>
                           <p className="text-xs sm:text-sm text-neutral-700 font-sans font-bold">
-                            {comparedProducts.length} / {typeof window !== "undefined" ? (window.innerWidth < 768 ? 2 : window.innerWidth < 1200 ? 3 : 4) : 4} {currentLang === "FR" ? "produit(s) sélectionné(s)" : "product(s) selected"}
+                            {comparedProducts.length} / {typeof window !== "undefined" ? (window.innerWidth < 768 ? 2 : window.innerWidth < 1200 ? 3 : 4) : 4}{" "}
+                            {currentLang === "FR" || currentLang === "CH"
+                              ? "produit(s) sélectionné(s)"
+                              : currentLang === "DE"
+                              ? "Produkt(e) ausgewählt"
+                              : "product(s) selected"}
                           </p>
                         </>
                       )}
@@ -634,15 +795,43 @@ export default function App() {
                         }`}
                       >
                         <Scale className="w-4.5 h-4.5" />
-                        {currentLang === "FR" ? `Comparer maintenant` : `Compare Now`}
+                        {currentLang === "FR" || currentLang === "CH"
+                          ? "Comparer maintenant"
+                          : currentLang === "DE"
+                          ? "Jetzt vergleichen"
+                          : "Compare Now"}
                       </button>
+
+                      {/* PC Exclusive: Auto-compare 4 creations */}
+                      <div className="hidden xl:block pt-3 border-t border-neutral-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="h-[1px] bg-neutral-200 flex-1" />
+                          <span className="text-[9px] font-mono font-black text-[#A37E2C] uppercase tracking-[0.2em]">
+                            {currentLang === "DE" ? "PC EXKLUSIV" : currentLang === "FR" || currentLang === "CH" ? "EXCLUSIF PC" : "DESKTOP EXCLUSIVE"}
+                          </span>
+                          <div className="h-[1px] bg-neutral-200 flex-1" />
+                        </div>
+                        <button
+                          onClick={handleAutoCompareFour}
+                          className="w-full py-2.5 bg-neutral-50 hover:bg-[#2E2218] hover:text-[#FAF9F4] text-[#2E2218] border border-[#2E2218] text-xs font-sans font-extrabold uppercase tracking-widest transition-all rounded shadow-sm cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.01]"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-[#A37E2C]" />
+                          {t.compareFourDesktop}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   {/* Section 2: Disciplines (Category Filter) */}
                   <div className="space-y-4">
                     <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#A37E2C] flex items-center justify-between">
-                      <span>{currentLang === "FR" ? "DISCIPLINES" : "SPECIALTIES"}</span>
+                      <span>
+                        {currentLang === "DE"
+                          ? "DISZIPLINEN"
+                          : currentLang === "FR" || currentLang === "CH"
+                          ? "DISCIPLINES"
+                          : "SPECIALTIES"}
+                      </span>
                       {(selectedSport || selectedSubCategory) && (
                         <button 
                           onClick={() => {
@@ -651,16 +840,56 @@ export default function App() {
                           }}
                           className="text-xs lowercase font-normal underline hover:text-[#2E2218] text-[#A37E2C]"
                         >
-                          {currentLang === "FR" ? "effacer tout" : "clear all"}
+                          {currentLang === "DE"
+                            ? "alle löschen"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "effacer tout"
+                            : "clear all"}
                         </button>
                       )}
                     </h4>
                     <div className="flex flex-col gap-3">
                       {[
-                        { id: null, label: currentLang === "FR" ? "Toutes les créations" : "All Specialties", count: localizedProducts.length },
-                        { id: "aerodynamisme", label: currentLang === "FR" ? "Vélo" : "Bike & Cycling", count: localizedProducts.filter(p => p.category === "aerodynamisme").length },
-                        { id: "resistance-active", label: currentLang === "FR" ? "Fitness" : "Fitness & Training", count: localizedProducts.filter(p => p.category === "resistance-active").length },
-                        { id: "exploration-sauvage", label: currentLang === "FR" ? "Randonnée" : "Hiking & Outdoor", count: localizedProducts.filter(p => p.category === "exploration-sauvage").length }
+                        {
+                          id: null,
+                          label:
+                            currentLang === "DE"
+                              ? "Alle Kreationen"
+                              : currentLang === "FR" || currentLang === "CH"
+                              ? "Toutes les créations"
+                              : "All Specialties",
+                          count: localizedProducts.length
+                        },
+                        {
+                          id: "aerodynamisme",
+                          label:
+                            currentLang === "DE"
+                              ? "Radsport"
+                              : currentLang === "FR" || currentLang === "CH"
+                              ? "Vélo"
+                              : "Bike & Cycling",
+                          count: localizedProducts.filter(p => p.category === "aerodynamisme").length
+                        },
+                        {
+                          id: "resistance-active",
+                          label:
+                            currentLang === "DE"
+                              ? "Fitness & Training"
+                              : currentLang === "FR" || currentLang === "CH"
+                              ? "Fitness"
+                              : "Fitness & Training",
+                          count: localizedProducts.filter(p => p.category === "resistance-active").length
+                        },
+                        {
+                          id: "exploration-sauvage",
+                          label:
+                            currentLang === "DE"
+                              ? "Wandern & Outdoor"
+                              : currentLang === "FR" || currentLang === "CH"
+                              ? "Randonnée"
+                              : "Hiking & Outdoor",
+                          count: localizedProducts.filter(p => p.category === "exploration-sauvage").length
+                        }
                       ].map((item) => {
                         const isSelected = selectedSport === item.id;
                         const hasSubCats = item.id && SUB_CATEGORIES[item.id];
@@ -715,7 +944,13 @@ export default function App() {
                                           : "text-neutral-600 hover:bg-neutral-100 hover:text-[#131211]"
                                       }`}
                                     >
-                                      <span>{currentLang === "FR" ? sub.label.FR : sub.label.EN}</span>
+                                      <span>
+                                        {currentLang === "DE"
+                                          ? sub.label.DE
+                                          : currentLang === "FR" || currentLang === "CH"
+                                          ? sub.label.FR
+                                          : sub.label.EN}
+                                      </span>
                                       <span className="text-[10px] font-mono opacity-60">({countSub})</span>
                                     </button>
                                   );
@@ -731,7 +966,11 @@ export default function App() {
                   {/* Section 3: Fine Sorting */}
                   <div className="space-y-4 pt-4 border-t border-neutral-200">
                     <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#A37E2C]">
-                      {currentLang === "FR" ? "TRIER LES PRODUITS" : "SORT PRODUCTS"}
+                      {currentLang === "DE"
+                        ? "PRODUKTE SORTIEREN"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "TRIER LES PRODUITS"
+                        : "SORT PRODUCTS"}
                     </h4>
                     <div className="relative">
                       <select
@@ -739,19 +978,154 @@ export default function App() {
                         onChange={(e) => setSortBy(e.target.value)}
                         className="w-full bg-white border border-neutral-300 rounded-md px-4 py-3 text-sm text-[#2E2218] focus:outline-none focus:border-[#A37E2C] focus:ring-1 focus:ring-[#A37E2C] shadow-sm font-sans cursor-pointer h-12"
                       >
-                        <option value="default">{currentLang === "FR" ? "Ordre par défaut" : "Default order"}</option>
-                        <option value="price-asc">{currentLang === "FR" ? "Prix : Ordre croissant" : "Price: Low to High"}</option>
-                        <option value="price-desc">{currentLang === "FR" ? "Prix : Ordre décroissant" : "Price: High to Low"}</option>
-                        <option value="reviews-desc">{currentLang === "FR" ? "Avis : Les mieux notés" : "Reviews: Highest Rated"}</option>
+                        <option value="default">
+                          {currentLang === "DE"
+                            ? "Standardreihenfolge"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Ordre par défaut"
+                            : "Default order"}
+                        </option>
+                        <option value="price-asc">
+                          {currentLang === "DE"
+                            ? "Preis: Aufsteigend"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Prix : Ordre croissant"
+                            : "Price: Low to High"}
+                        </option>
+                        <option value="price-desc">
+                          {currentLang === "DE"
+                            ? "Preis: Absteigend"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Prix : Ordre décroissant"
+                            : "Price: High to Low"}
+                        </option>
+                        <option value="reviews-desc">
+                          {currentLang === "DE"
+                            ? "Bewertungen: Beste zuerst"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Avis : Les mieux notés"
+                            : "Reviews: Highest Rated"}
+                        </option>
                       </select>
                     </div>
+                  </div>
+
+                  {/* Section 3.5: Master Size Filter (New size filter with Popular and Remaining lists) */}
+                  <div className="space-y-4 pt-4 border-t border-neutral-200">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#A37E2C]">
+                        {TRANSLATIONS[currentLang]?.filterBySize || TRANSLATIONS["EN"].filterBySize}
+                      </h4>
+                      {selectedSize && (
+                        <button 
+                          onClick={() => setSelectedSize(null)}
+                          className="text-xs lowercase font-normal underline hover:text-[#2E2218] text-[#A37E2C] cursor-pointer"
+                        >
+                          {TRANSLATIONS[currentLang]?.reset || TRANSLATIONS["EN"].reset}
+                        </button>
+                      )}
+                    </div>
+
+                    {sizesData.hasSizes ? (
+                      <div className="space-y-4">
+                        {/* 1. Popular Sizes Section */}
+                        {sizesData.popular.length > 0 && (
+                          <div className="space-y-2">
+                            <h5 className="text-[11px] uppercase tracking-wider font-extrabold text-neutral-400">
+                              {TRANSLATIONS[currentLang]?.popularSizes || TRANSLATIONS["EN"].popularSizes}
+                            </h5>
+                            <div className="space-y-1">
+                              {sizesData.popular.map(({ size, count }) => {
+                                const isSizeSelected = selectedSize === size;
+                                return (
+                                  <button
+                                    key={size}
+                                    onClick={() => setSelectedSize(isSizeSelected ? null : size)}
+                                    className={`w-full flex items-center justify-between py-1.5 px-2.5 rounded transition-all cursor-pointer group text-left ${
+                                      isSizeSelected 
+                                        ? "bg-[#2E2218]/5 text-[#2E2218]" 
+                                        : "hover:bg-[#2E2218]/5 text-neutral-700"
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2.5">
+                                      <div className={`w-4.5 h-4.5 rounded border transition-all flex items-center justify-center ${
+                                        isSizeSelected
+                                          ? "bg-[#2E2218] border-[#2E2218] text-white"
+                                          : "border-neutral-300 group-hover:border-[#A37E2C] bg-white"
+                                      }`}>
+                                        {isSizeSelected && <Check className="w-3 h-3 stroke-[3px]" />}
+                                      </div>
+                                      <span className={`text-xs sm:text-sm tracking-wide ${isSizeSelected ? "font-bold text-[#2E2218]" : "font-semibold text-[#2E2218] opacity-85 group-hover:opacity-100"}`}>
+                                        {formatSizeDisplay(size, currentLang)}
+                                      </span>
+                                    </div>
+                                    <span className="text-xs font-mono text-neutral-400 group-hover:text-[#A37E2C] font-semibold">
+                                      {count}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 2. All Other Sizes Section */}
+                        {sizesData.remaining.length > 0 && (
+                          <div className="space-y-2">
+                            <h5 className="text-[11px] uppercase tracking-wider font-extrabold text-neutral-400">
+                              {TRANSLATIONS[currentLang]?.allOtherSizes || TRANSLATIONS["EN"].allOtherSizes}
+                            </h5>
+                            <div className="max-h-56 overflow-y-auto pr-1 space-y-1 custom-scrollbar">
+                              {sizesData.remaining.map(({ size, count }) => {
+                                const isSizeSelected = selectedSize === size;
+                                return (
+                                  <button
+                                    key={size}
+                                    onClick={() => setSelectedSize(isSizeSelected ? null : size)}
+                                    className={`w-full flex items-center justify-between py-1.5 px-2.5 rounded transition-all cursor-pointer group text-left ${
+                                      isSizeSelected 
+                                        ? "bg-[#2E2218]/5 text-[#2E2218]" 
+                                        : "hover:bg-[#2E2218]/5 text-neutral-700"
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2.5">
+                                      <div className={`w-4.5 h-4.5 rounded border transition-all flex items-center justify-center ${
+                                        isSizeSelected
+                                          ? "bg-[#2E2218] border-[#2E2218] text-white"
+                                          : "border-neutral-300 group-hover:border-[#A37E2C] bg-white"
+                                      }`}>
+                                        {isSizeSelected && <Check className="w-3 h-3 stroke-[3px]" />}
+                                      </div>
+                                      <span className={`text-xs sm:text-sm tracking-wide ${isSizeSelected ? "font-bold text-[#2E2218]" : "font-semibold text-[#2E2218] opacity-85 group-hover:opacity-100"}`}>
+                                        {formatSizeDisplay(size, currentLang)}
+                                      </span>
+                                    </div>
+                                    <span className="text-xs font-mono text-neutral-400 group-hover:text-[#A37E2C] font-semibold">
+                                      {count}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-neutral-400 italic">
+                        {TRANSLATIONS[currentLang]?.noSizesAvailable || TRANSLATIONS["EN"].noSizesAvailable}
+                      </p>
+                    )}
                   </div>
 
                   {/* Section 4: Fine Luxury Price Filter range with custom dual range slider */}
                   <div className="space-y-5 pt-4 border-t border-neutral-200">
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs uppercase tracking-wider font-extrabold text-[#A37E2C]">
-                        {currentLang === "FR" ? "SÉLECTIONNER UN BUDGET" : "CHOOSE BUDGET"}
+                        {currentLang === "DE"
+                          ? "BUDGET WÄHLEN"
+                          : currentLang === "FR" || currentLang === "CH"
+                          ? "SÉLECTIONNER UN BUDGET"
+                          : "CHOOSE BUDGET"}
                       </h4>
                       {(userMinPrice !== null || userMaxPrice !== null) && (
                         <button 
@@ -761,7 +1135,11 @@ export default function App() {
                           }}
                           className="text-xs lowercase font-normal underline hover:text-[#2E2218] text-[#A37E2C]"
                         >
-                          {currentLang === "FR" ? "réinitialiser" : "reset"}
+                          {currentLang === "DE"
+                            ? "zurücksetzen"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "réinitialiser"
+                            : "reset"}
                         </button>
                       )}
                     </div>
@@ -830,11 +1208,13 @@ export default function App() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-[#A37E2C] uppercase tracking-wider">
-                        {currentLang === "FR" ? "ASSISTANT VIRTUEL" : "VIRTUAL ASSISTANT"}
+                        {currentLang === "FR" || currentLang === "CH" ? "ASSISTANT VIRTUEL" : currentLang === "DE" ? "VIRTUELLER ASSISTENT" : "VIRTUAL ASSISTANT"}
                       </p>
                       <p className="text-xs text-neutral-750 font-medium leading-normal font-sans mt-1.5 px-2">
-                        {currentLang === "FR" 
+                        {currentLang === "FR" || currentLang === "CH" 
                           ? "Besoin d'aide pour trouver un produit ? Posez vos questions à notre assistant." 
+                          : currentLang === "DE"
+                          ? "Haben Sie Fragen zu einem Produkt? Fragen Sie unseren Assistenten."
                           : "Need help finding a product? Ask our assistant."}
                       </p>
                     </div>
@@ -842,22 +1222,27 @@ export default function App() {
                       onClick={() => setChatbotOpenTrigger(true)}
                       className="w-full py-3 bg-white hover:bg-[#2E2218] hover:text-[#FAF9F4] text-[#2E2218] border border-neutral-300 rounded text-xs uppercase tracking-widest font-extrabold transition-all duration-300 cursor-pointer shadow-sm hover:scale-102"
                     >
-                      {currentLang === "FR" ? "LANCER L'ASSISTANT" : "START CHAT"}
+                      {currentLang === "FR" || currentLang === "CH" ? "LANCER L'ASSISTANT" : currentLang === "DE" ? "ASSISTENT STARTEN" : "START CHAT"}
                     </button>
                   </div>
 
                 </div>
 
                 {/* RIGHT COLUMN: The Products displaying with high performance organisation */}
-                <div className="md:col-span-8 space-y-10">
+                <div className={`${showFilters ? "md:col-span-8" : "md:col-span-12"} space-y-10 w-full`}>
                   
                   {/* Active Selection Breadcrumbs / Filter Tags Pillboxes feedback bar */}
                   <div className="bg-white border border-neutral-300/20 py-3.5 px-5 flex flex-wrap items-center justify-between gap-4 rounded-sm shadow-sm select-none">
                     <div className="flex flex-wrap items-center gap-2 text-[10px]">
                       <span className="text-neutral-400 font-light mr-1">
-                        {currentLang === "FR" ? "Sélection actuelle :" : "Active criteria:"}
+                        {currentLang === "DE"
+                          ? "Aktuelle Auswahl:"
+                          : currentLang === "FR" || currentLang === "CH"
+                          ? "Sélection actuelle :"
+                          : "Active criteria:"}
                       </span>
                       
+
 
 
                       {/* Sport Tag */}
@@ -865,10 +1250,10 @@ export default function App() {
                         <span className="bg-[#A37E2C] text-[#FAF9F4] px-2.5 py-1 rounded-sm font-semibold uppercase tracking-wider flex items-center gap-2">
                           <span>
                             {selectedSport === "aerodynamisme"
-                              ? (currentLang === "FR" ? "Vélo" : "Bike & Cycling")
+                              ? (currentLang === "DE" ? "Radsport" : currentLang === "FR" || currentLang === "CH" ? "Vélo" : "Bike & Cycling")
                               : selectedSport === "resistance-active"
-                              ? (currentLang === "FR" ? "Fitness" : "Fitness & Training")
-                              : (currentLang === "FR" ? "Randonnée" : "Hiking & Outdoor")}
+                              ? (currentLang === "DE" ? "Fitness & Training" : currentLang === "FR" || currentLang === "CH" ? "Fitness" : "Fitness & Training")
+                              : (currentLang === "DE" ? "Wandern & Outdoor" : currentLang === "FR" || currentLang === "CH" ? "Randonnée" : "Hiking & Outdoor")}
                           </span>
                           <button onClick={() => setSelectedSport(null)} className="hover:text-white text-xs font-bold font-mono">×</button>
                         </span>
@@ -884,16 +1269,36 @@ export default function App() {
                         </span>
                       )}
 
+                      {/* Size Tag */}
+                      {selectedSize && (
+                        <span className="bg-[#2E2218] text-[#FAF9F4] px-2.5 py-1 rounded-sm font-semibold uppercase tracking-wider flex items-center gap-2">
+                          <span>
+                            {(TRANSLATIONS[currentLang]?.sizeTagLabel || TRANSLATIONS["EN"].sizeTagLabel)}
+                            {formatSizeDisplay(selectedSize, currentLang)}
+                          </span>
+                          <button onClick={() => setSelectedSize(null)} className="hover:text-white text-xs font-bold font-mono">×</button>
+                        </span>
+                      )}
+
                       {/* Default clear indicators */}
-                      {!catalogSearchQuery.trim() && !selectedSport && userMinPrice === null && userMaxPrice === null && (
+                      {!catalogSearchQuery.trim() && !selectedSport && !selectedSize && userMinPrice === null && userMaxPrice === null && (
                         <span className="text-neutral-500 italic font-mono font-medium lowercase">
-                          {currentLang === "FR" ? "tous les produits sont affichés" : "all products showing"}
+                          {currentLang === "DE"
+                            ? "alle Produkte werden angezeigt"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "tous les produits sont affichés"
+                            : "all products showing"}
                         </span>
                       )}
                     </div>
 
                     <div className="text-[10px] font-mono tracking-widest text-[#A37E2C] uppercase font-bold">
-                      {filteredProducts.length} {currentLang === "FR" ? "RÉSULTATS" : "RESULTS"}
+                      {filteredProducts.length}{" "}
+                      {currentLang === "DE"
+                        ? "ERGEBNISSE"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "RÉSULTATS"
+                        : "RESULTS"}
                     </div>
                   </div>
 
@@ -920,10 +1325,16 @@ export default function App() {
                       <div className="text-4xl">🕊️</div>
                       <div className="space-y-2">
                         <h4 className="text-lg font-serif font-semibold text-[#131211]">
-                          {currentLang === "FR" ? "Aucun produit trouvé" : "No product found"}
+                          {currentLang === "DE"
+                            ? "Keine Produkte gefunden"
+                            : currentLang === "FR" || currentLang === "CH"
+                            ? "Aucun produit trouvé"
+                            : "No product found"}
                         </h4>
                         <p className="text-xs text-neutral-500 max-w-sm mx-auto leading-relaxed">
-                          {currentLang === "FR"
+                          {currentLang === "DE"
+                            ? "Keine Artikel entsprechen Ihren aktuellen Filtern. Versuchen Sie, Ihre Kriterien zurückzusetzen, oder fragen Sie unseren virtuellen Assistenten um Rat."
+                            : currentLang === "FR" || currentLang === "CH"
                             ? "Aucun article ne correspond à vos filtres actuels. Essayez de réinitialiser vos critères ou demandez conseil à notre assistant virtuel."
                             : "No items match your active filters. Try to reset your criteria or seek assistance from our virtual helper."}
                         </p>
@@ -936,17 +1347,18 @@ export default function App() {
                             setCatalogSearchQuery("");
                             setUserMinPrice(null);
                             setUserMaxPrice(null);
+                            setSelectedSize(null);
                             setSortBy("default");
                           }}
                           className="px-5 py-2.5 bg-[#2E2218] text-[#FAF9F4] text-[10px] uppercase tracking-wider font-extrabold shadow-sm hover:scale-102 transition-all cursor-pointer rounded-sm"
                         >
-                          {currentLang === "FR" ? "RÉINITIALISER TOUT" : "CLEAR CRITERIA"}
+                          {currentLang === "FR" || currentLang === "CH" ? "RÉINITIALISER TOUT" : currentLang === "DE" ? "ALLES ZURÜCKSETZEN" : "CLEAR CRITERIA"}
                         </button>
                         <button
                           onClick={() => setChatbotOpenTrigger(true)}
                           className="px-5 py-2.5 bg-white border border-[#2E2218] text-[#2E2218] text-[10px] uppercase tracking-wider font-extrabold hover:bg-neutral-50 shadow-sm hover:scale-102 transition-all cursor-pointer rounded-sm"
                         >
-                          {currentLang === "FR" ? "POSER UNE QUESTION" : "ASK A QUESTION"}
+                          {currentLang === "FR" || currentLang === "CH" ? "POSER UNE QUESTION" : currentLang === "DE" ? "FRAGE STELLEN" : "ASK A QUESTION"}
                         </button>
                       </div>
                     </div>
@@ -956,7 +1368,9 @@ export default function App() {
                   {filteredProducts.length > displayedProducts.length && (
                     <div className="mt-14 text-center space-y-4 animate-fade-in">
                       <div className="text-[9px] font-mono tracking-widest text-[#A37E2C] font-extrabold uppercase select-none">
-                        {currentLang === "FR" 
+                        {currentLang === "DE"
+                          ? `Zeige ${displayedProducts.length} von ${filteredProducts.length} exklusiven Modellen`
+                          : currentLang === "FR" || currentLang === "CH" 
                           ? `Affichage de ${displayedProducts.length} sur ${filteredProducts.length} pièces d'exception`
                           : `Showing ${displayedProducts.length} out of ${filteredProducts.length} master models`}
                       </div>
@@ -966,7 +1380,11 @@ export default function App() {
                   {/* Elegant Back to Homepage exit mechanism */}
                   <div className="flex flex-col items-center justify-center pt-16 border-t border-neutral-250/20 mt-16 space-y-4 bg-[#FAF9F4]/45 p-10 rounded-sm">
                     <p className="text-[10px] tracking-[0.2em] font-sans font-light text-neutral-400">
-                      {currentLang === "FR" ? "Vous avez fini votre recherche ?" : "Finished with your custom search?"}
+                      {currentLang === "DE"
+                        ? "Haben Sie Ihre Suche abgeschlossen?"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "Vous avez fini votre recherche ?"
+                        : "Finished with your custom search?"}
                     </p>
                     <button
                       onClick={() => {
@@ -979,7 +1397,12 @@ export default function App() {
                       }}
                       className="px-8 py-3.5 bg-[#FAF9F4] border border-[#2E2218] text-[#2E2218] hover:bg-[#2E2218] hover:text-[#FAF9F4] tracking-[0.2em] text-[10px] uppercase font-bold transition-all cursor-pointer shadow-sm hover:scale-102 rounded-sm"
                     >
-                      ← {currentLang === "FR" ? "REVENIR À L'ACCUEIL" : "BACK TO HOMEPAGE"}
+                      ←{" "}
+                      {currentLang === "DE"
+                        ? "ZURÜCK ZUR STARTSEITE"
+                        : currentLang === "FR" || currentLang === "CH"
+                        ? "REVENIR À L'ACCUEIL"
+                        : "BACK TO HOMEPAGE"}
                     </button>
                   </div>
 
@@ -1000,33 +1423,29 @@ export default function App() {
             
             <div className="space-y-6">
               <span className="text-sm sm:text-base uppercase tracking-[0.3em] text-[#A37E2C] font-bold block">
-                {currentLang === "FR" ? "NOTRE HISTOIRE DEPUIS 1924" : "OUR HISTORY SINCE 1924"}
+                {t.ourHistoryTitle}
               </span>
               
               <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-white leading-tight">
-                {currentLang === "FR" 
-                  ? "Créateurs de vêtements et d'équipements de sport à Chamonix"
-                  : "Creators of high-performance sportswear and equipment in Chamonix"}
+                {t.historyTitle}
               </h2>
 
               <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-sans font-light">
-                {currentLang === "FR"
-                  ? "Née à Chamonix lors des mémorables Jeux Olympiques d'hiver de 1924, la Maison Atlis incarne l'alliance parfaite entre hautes performances sportives et finitions soignées. Tous nos vélos et vêtements techniques sont fabriqués pour vous garantir un confort thermique optimal et une liberté de mouvement maximale."
-                  : "Founded in Chamonix during the historic 1924 Winter Olympics, Maison Atlis represents the perfect association of high performance and elegant tailoring. Our custom cycling frames and technical garments are carefully made to ensure optimal temperature control and complete freedom of motion."}
+                {t.historyText}
               </p>
 
               <div className="grid grid-cols-3 gap-6 pt-4 border-t border-white/10 text-center">
                 <div className="space-y-1">
                   <p className="text-2xl font-serif text-[#A37E2C] font-black">1924</p>
-                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">Fondation</p>
+                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">{t.foundation}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-2xl font-serif text-[#A37E2C] font-black">100%</p>
-                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">Main d'œuvre</p>
+                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">{t.manpower}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-2xl font-serif text-[#A37E2C] font-black">UTC+1</p>
-                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">Origine Alpes</p>
+                  <p className="text-xs sm:text-sm uppercase tracking-wider text-zinc-300 font-bold">{t.alpsOrigin}</p>
                 </div>
               </div>
             </div>
@@ -1034,8 +1453,20 @@ export default function App() {
             {/* Illustrated graphic card frame */}
             <div className="relative aspect-[4/3] bg-neutral-900 border border-white/10 overflow-hidden group shadow-2xl">
               <img
-                src="https://contents.mediadecathlon.com/p2500724/k$12e175a896fb0390b6a21d0ddef5c821/picture.jpg"
-                alt="Atelier d'excellence Chamonix 1924"
+                src={
+                  currentLang === "DE"
+                    ? "https://contents.mediadecathlon.com/p3100647/k$27fae6bc01fae013b03df9fc665513c3/picture.jpg"
+                    : currentLang === "EN"
+                    ? "https://contents.mediadecathlon.com/p2833332/k$59cd136a58efffe050be170c2b7f0cf5/picture.jpg"
+                    : "https://contents.mediadecathlon.com/p2500724/k$12e175a896fb0390b6a21d0ddef5c821/picture.jpg"
+                }
+                alt={
+                  currentLang === "DE"
+                    ? "Atlis Exzellenz-Werkstatt Chamonix 1924"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Atelier d'excellence Chamonix 1924"
+                    : "Chamonix 1924 Workshop of Excellence"
+                }
                 className="w-full h-full object-cover filter brightness-[0.6] group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-80" />
@@ -1043,7 +1474,7 @@ export default function App() {
                 <Award className="w-5 h-5 text-[#A37E2C] mx-auto" />
                 <p className="text-xs sm:text-sm uppercase tracking-[0.2em] font-bold text-[#A37E2C]">La Chaux-de-Fonds & Chamonix</p>
                 <p className="text-sm sm:text-base text-zinc-200">
-                  {currentLang === "FR" ? "Ateliers de couture et d'unification mécanique" : "Textile tailoring & mechanical alignment workshops"}
+                  {t.workshopsLabel}
                 </p>
               </div>
             </div>
@@ -1060,10 +1491,18 @@ export default function App() {
         >
           <div className="space-y-3">
             <span className="text-xs sm:text-sm uppercase tracking-[0.3em] text-[#A37E2C] font-black">
-              {currentLang === "FR" ? "VOTRE MATÉRIEL PERSONNALISÉ" : "YOUR CUSTOM GEAR"}
+              {currentLang === "DE"
+                ? "IHRE MASSGESCHNEIDERTE AUSRÜSTUNG"
+                : currentLang === "FR" || currentLang === "CH"
+                ? "VOTRE MATÉRIEL PERSONNALISÉ"
+                : "YOUR CUSTOM GEAR"}
             </span>
             <h2 className="text-3xl font-serif font-bold text-[#131211]">
-              {currentLang === "FR" ? "Un Service et un Accompagnement Dédiés" : "Specialized Services & Consultation"}
+              {currentLang === "DE"
+                ? "Exklusiver Service & Persönliche Beratung"
+                : currentLang === "FR" || currentLang === "CH"
+                ? "Un Service et un Accompagnement Dédiés"
+                : "Specialized Services & Consultation"}
             </h2>
             <div className="h-0.5 bg-[#A37E2C] w-12 mx-auto" />
           </div>
@@ -1078,16 +1517,30 @@ export default function App() {
                 <Shield className="w-5 h-5 animate-pulse" />
               </div>
               <h3 className="text-base font-serif font-bold text-[#131211] group-hover:text-[#A37E2C] transition-colors flex items-center justify-between">
-                <span>{currentLang === "FR" ? "Garantie et Service Client" : "Customer Support & Warranty"}</span>
+                <span>
+                  {currentLang === "DE"
+                    ? "Kundendienst & Garantie"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Garantie et Service Client"
+                    : "Customer Support & Warranty"}
+                </span>
                 <span className="text-xs text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
               </h3>
               <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-sans">
-                {currentLang === "FR"
+                {currentLang === "DE"
+                  ? "Alle unsere Produkte sind voll garantiert und profitieren von einem lokalen Kundenservice für absolute Zufriedenheit. Klicken Sie hier, um Ihren Vertrag einzusehen."
+                  : currentLang === "FR" || currentLang === "CH"
                   ? "Tous nos équipements sont garantis de par leur excellence. Cliquez pour ouvrir notre assistance de proximité et vérifier de vos contrats."
                   : "All of our products are fully warrantied and benefit from local customer assistance for absolute satisfaction. Click to inspect your contract."}
               </p>
               <div className="pt-2 flex items-center gap-1 text-xs sm:text-sm text-[#A37E2C] font-mono tracking-widest font-black uppercase">
-                <span>{currentLang === "FR" ? "Voir la Garantie" : "Inspect Warranty"}</span>
+                <span>
+                  {currentLang === "DE"
+                    ? "Garantie ansehen"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Voir la Garantie"
+                    : "Inspect Warranty"}
+                </span>
                 <span>→</span>
               </div>
             </div>
@@ -1101,16 +1554,30 @@ export default function App() {
                 <Hammer className="w-5 h-5" />
               </div>
               <h3 className="text-base font-serif font-bold text-[#131211] group-hover:text-[#A37E2C] transition-colors flex items-center justify-between">
-                <span>{currentLang === "FR" ? "Personnalisation Unique" : "Customization"}</span>
+                <span>
+                  {currentLang === "DE"
+                    ? "Einzigartige Anpassung"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Personnalisation Unique"
+                    : "Customization"}
+                </span>
                 <span className="text-xs text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
               </h3>
               <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-sans">
-                {currentLang === "FR"
+                {currentLang === "DE"
+                  ? "Fügen Sie Ihre Initialen oder individuellen Logos zu Ihren Fahrradrahmen, Taschen oder Kleidungsstücken hinzu. Klicken Sie hier, um unsere Stick- und Gravurwerkstatt zu öffnen."
+                  : currentLang === "FR" || currentLang === "CH"
                   ? "Ajoutez vos initiales ou logos personnalisés sur vos cadres de vélos, sacs et vêtements. Cliquez pour essayer notre outil de gravure."
                   : "Add your initials or custom logos to your cycling frames, bags, or apparel. Click to open our live embroidery and engraving workshop."}
               </p>
               <div className="pt-2 flex items-center gap-1 text-xs sm:text-sm text-[#A37E2C] font-mono tracking-widest font-black uppercase">
-                <span>{currentLang === "FR" ? "Lancer l'Atelier" : "Open Workshop"}</span>
+                <span>
+                  {currentLang === "DE"
+                    ? "Atelier starten"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Lancer l'Atelier"
+                    : "Open Workshop"}
+                </span>
                 <span>→</span>
               </div>
             </div>
@@ -1124,16 +1591,30 @@ export default function App() {
                 <Sparkles className="w-5 h-5" />
               </div>
               <h3 className="text-base font-serif font-bold text-[#131211] group-hover:text-[#A37E2C] transition-colors flex items-center justify-between">
-                <span>{currentLang === "FR" ? "Conseils pour les Tailles" : "Size Advisors"}</span>
+                <span>
+                  {currentLang === "DE"
+                    ? "Größenberatung"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Conseils pour les Tailles"
+                    : "Size Advisors"}
+                </span>
                 <span className="text-xs text-[#A37E2C] opacity-0 group-hover:opacity-100 transition-opacity">➔</span>
               </h3>
               <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-sans">
-                {currentLang === "FR"
+                {currentLang === "DE"
+                  ? "Wählen Sie mit Hilfe unseres interaktiven Größenrechners die perfekte Größe für Ihren Fahrradrahmen, Ihre Kleidung oder Ihre Schuhe aus."
+                  : currentLang === "FR" || currentLang === "CH"
                   ? "Choisissez la taille idéale à l'aide de notre conseiller biomec interactif en adaptant les côtes géométriques à vos mesures corporelles."
                   : "Choose the perfect size for your bike frame, clothing, or footwear. Click to open our instant physiological scale calculator."}
               </p>
               <div className="pt-2 flex items-center gap-1 text-xs sm:text-sm text-[#A37E2C] font-mono tracking-widest font-black uppercase">
-                <span>{currentLang === "FR" ? "Calculer ma Taille" : "Calculate My Size"}</span>
+                <span>
+                  {currentLang === "DE"
+                    ? "Meine Größe berechnen"
+                    : currentLang === "FR" || currentLang === "CH"
+                    ? "Calculer ma Taille"
+                    : "Calculate My Size"}
+                </span>
                 <span>→</span>
               </div>
             </div>
@@ -1153,14 +1634,12 @@ export default function App() {
               <span className="text-lg font-serif font-bold text-white tracking-[0.2em] uppercase">ATLIS S.C.</span>
             </div>
             <p className="text-xs sm:text-sm leading-relaxed text-zinc-300">
-              {currentLang === "FR"
-                ? "L'excellence athlétique, l'art plastique de Chamonix — Inspiré par l'Olympe depuis 1924."
-                : "Athletic excellence, plastic art form of Chamonix — Inspired by Olympus since index 1924."}
+              {t.brandDescription}
             </p>
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">Ateliers & Salons</p>
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">{t.ateliersSalons}</p>
             <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
               <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#A37E2C]" /> Chamonix-Mont-Blanc</li>
               <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#A37E2C]" /> Place Vendôme, Paris</li>
@@ -1169,18 +1648,18 @@ export default function App() {
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">Assistance</p>
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">{t.assistance}</p>
             <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
-              <li><button onClick={() => setChatbotOpenTrigger(true)} className="hover:text-white transition-colors cursor-pointer text-left">Contacter un conseiller d'Olympe</button></li>
-              <li>{currentLang === "FR" ? "Politique de confidentialité" : "Privacy Policies"}</li>
-              <li>{currentLang === "FR" ? "Conditions d'Acquisition" : "Acquisition Agreements"}</li>
+              <li><button onClick={() => setChatbotOpenTrigger(true)} className="hover:text-white transition-colors cursor-pointer text-left">{t.contactAdvisor}</button></li>
+              <li>{t.privacyPolicies}</li>
+              <li>{t.acquisitionAgreements}</li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">Notre Gazette</p>
+            <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-[#A37E2C] font-extrabold">{t.ourGazette}</p>
             <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              {currentLang === "FR" ? "Recevez confidentiellement les récits de nos expéditions." : "Receive confidential records of our seasonal wild routes."}
+              {t.gazetteSub}
             </p>
             <div className="flex border border-white/10 overflow-hidden focus-within:border-[#A37E2C] transition-colors rounded">
               <input 
@@ -1196,9 +1675,9 @@ export default function App() {
 
         <div className="border-t border-white/5 pt-6 text-xs tracking-widest text-[#FAF9F4]/50 flex flex-col md:flex-row md:justify-between items-center gap-4 max-w-7xl mx-auto md:pr-28">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-center md:text-left">
-            <span>© {new Date().getFullYear()} MAISON ATLIS SPORT COUTURE. TOUS DROITS RÉSERVÉS.</span>
+            <span>© {new Date().getFullYear()} MAISON ATLIS SPORT COUTURE. {t.allRightsReserved}</span>
             <span className="hidden md:inline text-zinc-600 font-serif">|</span>
-            <span className="font-serif italic text-zinc-400 text-sm sm:text-base md:text-lg">« Plus vite, plus haut, plus fort — ensemble »</span>
+            <span className="font-serif italic text-zinc-400 text-sm sm:text-base md:text-lg">{t.slogan}</span>
           </div>
         </div>
       </footer>

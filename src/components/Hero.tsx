@@ -17,7 +17,11 @@ export default function Hero({ currentLang, onSelectCategory }: HeroProps) {
       label: t.banner1Label,
       image: "https://contents.mediadecathlon.com/p2833332/k$59cd136a58efffe050be170c2b7f0cf5/picture.jpg",
       category: "aerodynamisme",
-      cta: currentLang === "FR" ? "L'Aéro d'Exception" : "Aerodynamic Line",
+      cta: currentLang === "DE"
+        ? "Das herausragende Aero"
+        : currentLang === "FR" || currentLang === "CH"
+        ? "L'Aéro d'Exception"
+        : "Aerodynamic Line",
       color: "from-emerald-950/80"
     },
     {
@@ -25,7 +29,11 @@ export default function Hero({ currentLang, onSelectCategory }: HeroProps) {
       label: t.banner2Label,
       image: "https://contents.mediadecathlon.com/p2500724/k$12e175a896fb0390b6a21d0ddef5c821/picture.jpg",
       category: "resistance-active",
-      cta: currentLang === "FR" ? "PRODUITS DE MAISON" : "HOME PRODUCTS",
+      cta: currentLang === "DE"
+        ? "HAUSPRODUKTE"
+        : currentLang === "FR" || currentLang === "CH"
+        ? "PRODUITS DE MAISON"
+        : "HOME PRODUCTS",
       color: "from-amber-950/80"
     },
     {
@@ -33,7 +41,11 @@ export default function Hero({ currentLang, onSelectCategory }: HeroProps) {
       label: t.banner3Label,
       image: "https://contents.mediadecathlon.com/p3100647/k$27fae6bc01fae013b03df9fc665513c3/picture.jpg",
       category: "exploration-sauvage",
-      cta: currentLang === "FR" ? "Conquérir les Sommets" : "Explore Wild summits",
+      cta: currentLang === "DE"
+        ? "Gipfel erobern"
+        : currentLang === "FR" || currentLang === "CH"
+        ? "Conquérir les Sommets"
+        : "Explore Wild summits",
       color: "from-stone-900/80"
     }
   ];

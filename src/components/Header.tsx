@@ -307,7 +307,7 @@ export default function Header({
               </button>
 
               {showSportsMenu && (
-                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-[#FAF9F4] text-[#131211] border-2 border-[#A37E2C]/50 shadow-2xl z-50 py-2 divide-y-2 divide-neutral-200/80 font-bold text-xs sm:text-sm tracking-wider uppercase rounded-lg overflow-hidden animate-fade-in">
+                <div className="fixed md:absolute top-24 md:top-auto left-1/2 md:left-auto md:right-0 transform -translate-x-1/2 md:transform-none mt-2 w-[calc(100vw-32px)] sm:w-80 bg-[#FAF9F4] text-[#131211] border-2 border-[#A37E2C]/50 shadow-2xl z-50 py-2 divide-y-2 divide-neutral-200/80 font-bold text-xs sm:text-sm tracking-wider uppercase rounded-lg overflow-hidden animate-fade-in">
                   <button
                     onClick={() => {
                       if (onSportSelect) onSportSelect(null);
@@ -452,7 +452,8 @@ export default function Header({
                           {/* Close button for easy mobile dismissal */}
                           <button 
                             onClick={() => setShowFavoritesMenu(false)}
-                            className="md:hidden text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
+                            className="text-neutral-500 hover:text-neutral-850 p-2 cursor-pointer bg-neutral-150/80 hover:bg-neutral-200 rounded-full transition-colors flex items-center justify-center min-w-[36px] min-h-[36px]"
+                            title={currentLang === "FR" ? "Fermer" : "Close"}
                           >
                             <X className="w-4 h-4" />
                           </button>

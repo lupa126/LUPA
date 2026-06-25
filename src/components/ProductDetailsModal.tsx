@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Product } from "../types";
 import { X, Star, Check, ShoppingBag, ShieldCheck, Heart } from "lucide-react";
 import { TRANSLATIONS } from "../data/translations";
-import { formatPrice } from "../utils/translator";
+import { formatPrice, formatSizeDisplay } from "../utils/translator";
 
 interface ProductDetailsModalProps {
   product: Product | null;
@@ -196,7 +196,7 @@ export default function ProductDetailsModal({
                           : "bg-white border-neutral-300/70 hover:border-[#A37E2C] text-[#131211]"
                       }`}
                     >
-                      {size}
+                      {formatSizeDisplay(size, currentLang)}
                     </button>
                   ))}
                 </div>
@@ -235,7 +235,13 @@ export default function ProductDetailsModal({
                   ? "border-red-500 text-red-550 bg-red-50/70" 
                   : "border-neutral-300/50 hover:border-[#A37E2C] text-[#131211] bg-white"
               }`}
-              title={currentLang === "FR" ? "Ajouter aux favoris de la Maison" : "Add to Maison favorites"}
+              title={
+                currentLang === "FR" || currentLang === "CH"
+                  ? "Ajouter aux favoris de la Maison"
+                  : currentLang === "DE"
+                  ? "Zu Favoriten hinzufügen"
+                  : "Add to Maison favorites"
+              }
             >
               <Heart className={`w-4 h-4 transition-transform active:scale-125 ${isFavorite ? "fill-red-500 text-red-500" : "text-[#131211] hover:text-[#A37E2C]"}`} />
             </button>
@@ -244,7 +250,7 @@ export default function ProductDetailsModal({
           {/* Luxury assurance mark */}
           <div className="mt-4 flex items-center gap-2 text-[9px] tracking-wider uppercase text-neutral-400 font-semibold justify-center">
             <ShieldCheck className="w-3.5 h-3.5 text-[#A37E2C]" />
-            <span>Assurance d'Authenticité Maison Atlis Certifiée</span>
+            <span>{t.authenticAssurance}</span>
           </div>
 
         </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, Sparkles, Compass, CheckCircle, ArrowRight, RotateCcw } from "lucide-react";
 import { ChatMessage, Product } from "../types";
 import { formatPrice } from "../utils/translator";
+import { TRANSLATIONS } from "../data/translations";
 
 interface ChatbotProps {
   currentLang: string;
@@ -214,6 +215,8 @@ export default function Chatbot({
   const [isLoading, setIsLoading] = useState(false);
   const [inputVal, setInputVal] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.FR;
 
   // Guided shopping Q&A state machine
   const [guidedStep, setGuidedStep] = useState<GuidedStep>("discipline");
@@ -627,14 +630,16 @@ export default function Chatbot({
             {/* Logo Crest */}
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#A37E2C]/10 border border-[#A37E2C]/40 text-[#A37E2C] rounded text-[10px] uppercase font-black font-mono tracking-widest">
-                🏆 Salon Maison Atlis Chamonix
+                🏆 {currentLang === "FR" || currentLang === "CH" ? "Salon Maison Atlis Chamonix" : currentLang === "DE" ? "Salon Maison Atlis Chamonix" : "Maison Atlis Chamonix Salon"}
               </div>
               <h1 className="text-4xl font-serif font-black tracking-tight leading-none text-white uppercase">
-                Conseil d'Atelier
+                {currentLang === "FR" || currentLang === "CH" ? "Conseil d'Atelier" : currentLang === "DE" ? "Atelier-Beratung" : "Atelier Advisory"}
               </h1>
               <p className="text-zinc-300 font-sans font-medium text-sm leading-relaxed max-w-sm mt-3">
-                {currentLang === "FR"
+                {currentLang === "FR" || currentLang === "CH"
                   ? "Depuis 1924 au pied du Mont-Blanc, notre Maison imagine des silhouettes d'athlètes et de randonneurs d'élite. Parcourez ce salon virtuel : sélectionnez des réponses prédéfinis pour réduire progressivement notre catalogue à votre compagnon idéal."
+                  : currentLang === "DE"
+                  ? "Seit 1924 am Fuße des Mont Blanc entwirft unser Haus Silhouetten von Elitesportlern und Wanderern. Durchlaufen Sie diesen virtuellen Salon: Wählen Sie vorgefertigte Antworten aus, um unseren Katalog direkt auf Ihren perfekten Begleiter abzustimmen."
                   : "Since 1924 at the foot of Mont Blanc, our Maison crafts silhouettes of elite sportsmanship. Go through this virtual salon: select pre-made answers to narrow down our catalogue directly to your perfect companion."}
               </p>
             </div>
@@ -643,11 +648,11 @@ export default function Chatbot({
             <div className="space-y-4 border-t border-[#A37E2C]/20 pt-6">
               <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono tracking-wider">
                 <span>CHAMONIX MONT-BLANC</span>
-                <span>COORDONNÉES: 45.92° N</span>
+                <span>{t.coordinates}</span>
               </div>
               <div className="flex items-center justify-between text-[11px] text-[#A37E2C] font-mono font-black border-b border-[#A37E2C]/10 pb-2">
-                <span>Savoir-faire Centenaire</span>
-                <span>ANNÉE : 1924</span>
+                <span>{t.centennialCraftsmanship}</span>
+                <span>{t.yearLabel}</span>
               </div>
             </div>
           </div>
@@ -662,12 +667,12 @@ export default function Chatbot({
                 </div>
                 <div>
                   <h4 className="text-[11px] md:text-xs font-serif font-black tracking-widest text-[#FAF9F4] uppercase">
-                    ORIENTATION MAISON ATLIS
+                    {t.orientationMaisonAtlis}
                   </h4>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="w-1.5 h-1.5 bg-[#16A34A] rounded-full animate-pulse" />
                     <span className="text-[8px] text-zinc-400 font-mono font-black uppercase tracking-wider">
-                      {currentLang === "FR" ? "Étalonnage en direct (Chamonix)" : "Calibration Live (Chamonix)"}
+                      {t.calibrationLive}
                     </span>
                   </div>
                 </div>

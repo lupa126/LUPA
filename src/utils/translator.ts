@@ -1,4 +1,5 @@
 import { Product } from "../types";
+import { TRANSLATIONS } from "../data/translations";
 
 const WORD_REPLACEMENTS: Record<string, Record<string, string>> = {
   EN: {
@@ -124,12 +125,43 @@ const WORD_REPLACEMENTS: Record<string, Record<string, string>> = {
     "pédales": "Pedale",
     "boussole": "Kompass",
     "poncho": "Poncho",
+    // Color translations
+    "bleu nuit": "nachtblau",
+    "bleu tempête": "sturmblau",
+    "bleu abysse": "abyssblau",
+    "bleu clair": "hellblau",
+    "bleu foncé": "dunkelblau",
+    "bleu": "blau",
+    "noir/carbone": "schwarz/carbon",
+    "noir": "schwarz",
+    "blanc": "weiß",
+    "vert amande": "mandelgrün",
+    "vert sauge": "salbeigrün",
+    "vert": "grün",
+    "jaune": "gelb",
+    "rouge": "rot",
+    "gris tempête": "sturmgrau",
+    "gris carbone": "carbongrau",
+    "gris anthracite": "anthrazitgrau",
+    "gris/noir": "grau/schwarz",
+    "gris": "grau",
+    "beige": "beige",
+    "marron": "braun",
+    "argent": "silber",
+    "bronze": "bronze",
+    "rose": "rosa",
+    "violet": "violett",
+    "orange": "orange",
+    "sable": "sandfarben",
+    "kaki": "khaki",
+    "bordeaux": "bordeauxrot"
   }
 };
 
 export function translateText(text: string, lang: string): string {
-  if (lang === "FR" || lang === "CH") return text;
-  const dict = WORD_REPLACEMENTS[lang];
+  if (lang === "FR") return text;
+  const lookupLang = lang === "CH" ? "DE" : lang;
+  const dict = WORD_REPLACEMENTS[lookupLang];
   if (!dict) return text;
 
   let translated = text;
@@ -141,11 +173,15 @@ export function translateText(text: string, lang: string): string {
     // Case insensitive regex replacement
     const regex = new RegExp(key, "gi");
     translated = translated.replace(regex, (match) => {
+      let finalRep = replacement;
+      if (lang === "CH") {
+        finalRep = finalRep.replace(/ß/g, "ss");
+      }
       // Preserve uppercase if the original started with capital letter
       if (match[0] === match[0].toUpperCase()) {
-        return replacement[0].toUpperCase() + replacement.slice(1);
+        return finalRep[0].toUpperCase() + finalRep.slice(1);
       }
-      return replacement.toLowerCase();
+      return finalRep.toLowerCase();
     });
   }
 
@@ -280,7 +316,7 @@ const PREMIUM_DETAILS: Record<string, Record<string, string[]>> = {
 };
 
 export function translateProduct(p: Product, lang: string): Product {
-  if (lang === "FR" || lang === "CH") {
+  if (lang === "FR") {
     return p; // Native French content
   }
 
@@ -288,7 +324,7 @@ export function translateProduct(p: Product, lang: string): Product {
   let categoryLabel = p.categoryLabel;
   if (lang === "EN") {
     categoryLabel = p.category === "aerodynamisme" ? "Cycling & Aerodynamics" : p.category === "exploration-sauvage" ? "Hiking & Outdoor" : "Fitness & Active Resistance";
-  } else if (lang === "DE") {
+  } else if (lang === "DE" || lang === "CH") {
     categoryLabel = p.category === "aerodynamisme" ? "Radsport & Aerodynamik" : p.category === "exploration-sauvage" ? "Wandern & Outdoor" : "Fitness & Krafttraining";
   }
 
@@ -296,8 +332,14 @@ export function translateProduct(p: Product, lang: string): Product {
 
   // Check custom premium translations first
   let description = p.description;
+  const lookupLang = lang === "CH" ? "DE" : lang;
   if (PREMIUM_DESCRIPTIONS[p.id]?.[lang]) {
     description = PREMIUM_DESCRIPTIONS[p.id][lang];
+  } else if (PREMIUM_DESCRIPTIONS[p.id]?.[lookupLang]) {
+    description = PREMIUM_DESCRIPTIONS[p.id][lookupLang];
+    if (lang === "CH") {
+      description = description.replace(/ß/g, "ss");
+    }
   } else {
     description = translateText(p.description, lang);
   }
@@ -305,6 +347,8 @@ export function translateProduct(p: Product, lang: string): Product {
   let details = p.details;
   if (PREMIUM_DETAILS[p.id]?.[lang]) {
     details = PREMIUM_DETAILS[p.id][lang];
+  } else if (PREMIUM_DETAILS[p.id]?.[lookupLang]) {
+    details = PREMIUM_DETAILS[p.id][lookupLang].map((d) => lang === "CH" ? d.replace(/ß/g, "ss") : d);
   } else {
     // Translate decathlon default details list
     details = p.details.map((detail) => {
@@ -317,14 +361,18 @@ export function translateProduct(p: Product, lang: string): Product {
           .replace("retours certifiés", "certified reviews")
           .replace("Tailles disponibles", "Available sizes")
           .replace("Premium Standard", "Premium Standard Size");
-      } else if (lang === "DE") {
+      } else if (lang === "DE" || lang === "CH") {
+        const standardGroup = "Kollektion: Olympus Premium-Ausrüstung";
+        const lessons = "Lehren des Berges: Bewährte Premium-Materialien";
+        const sizesAvail = lang === "CH" ? "Verfügbare Grössen" : "Verfügbare Größen";
+        const stdSize = lang === "CH" ? "Premium-Standardgrösse" : "Premium-Standardgröße";
         tDetail = tDetail
-          .replace("Gamme : Équipements d'Olympe", "Kollektion: Olympus Premium-Ausrüstung")
-          .replace("Leçons de la Montagne : Matériaux de prestige éprouvés", "Lehren des Berges: Bewährte Premium-Materialien")
+          .replace("Gamme : Équipements d'Olympe", standardGroup)
+          .replace("Leçons de la Montagne : Matériaux de prestige éprouvés", lessons)
           .replace("Évaluation globale", "Gesamtbewertung")
           .replace("retours certifiés", "verifizierte Bewertungen")
-          .replace("Tailles disponibles", "Verfügbare Größen")
-          .replace("Premium Standard", "Premium-Standardgröße");
+          .replace("Tailles disponibles", sizesAvail)
+          .replace("Premium Standard", stdSize);
       }
       return translateText(tDetail, lang);
     });
@@ -368,3 +416,23 @@ export function formatPrice(price: number, lang: string): string {
   const formatted = price.toLocaleString("fr-FR", options);
   return `${formatted} €`;
 }
+
+export function formatSizeDisplay(size: string, lang: string): string {
+  if (!size) return "";
+  const s = size.trim().toUpperCase().replace(/\.$/, "");
+  const noSizeTerms = [
+    "NO SIZE",
+    "SANS TAILLE",
+    "UNIQUE",
+    "TAILLE UNIQUE",
+    "ONE SIZE",
+    "TU",
+    "U"
+  ];
+  if (noSizeTerms.includes(s)) {
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS["EN"];
+    return dict.oneSize;
+  }
+  return size;
+}
+

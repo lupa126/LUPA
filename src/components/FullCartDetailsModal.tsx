@@ -192,7 +192,7 @@ export default function FullCartDetailsModal({
                   </div>
 
                   <span className="hidden sm:inline text-xs text-neutral-400 font-medium self-end capitalize">
-                    {currentLang === "FR" ? "Prix" : "Price"}
+                    {currentLang === "DE" || currentLang === "CH" ? "Preis" : currentLang === "FR" ? "Prix" : "Price"}
                   </span>
                 </div>
 
